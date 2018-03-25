@@ -1,0 +1,25 @@
+<!--pages/tp/tp.wxml-->
+
+
+<view class="container">
+
+  <view class="userinfo">
+    <button wx:if="{{!hasUserInfo && canIUse}}" open-type="getUserInfo" bindgetuserinfo="getUserInfo"> 获取头像昵称 </button>
+    <block wx:else>
+      <image bindtap="bindViewTap" class="userinfo-avatar" src="{{userInfo.avatarUrl}}" background-size="cover"></image>
+      <text class="userinfo-nickname">{{userInfo.nickName}}</text>
+    </block>
+  </view>
+
+  <!-- 服务器连通测试 -->
+  <view class="tunnel">
+      <view class="tunnel-text uploader-text">
+          <text bindtap="">连通服务器</text>
+          <switch class="tunnel-switch" bindchange="tpserver" color="#007AFF"/>
+      </view>
+      <view class="tunnel-text" wx:if="{{requestResult}}">
+          <text class="request-text">{{'请求结果：' + requestResult}}</text>
+      </view>
+  </view>
+</view>
+  

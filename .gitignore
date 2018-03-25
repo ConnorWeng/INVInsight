@@ -1,0 +1,8 @@
+
+server/composer.lock
+server/*.log
+server/thinkphp
+server/vendor
+
+.tags
+.tags_sorted_by_file
