@@ -1,0 +1,4 @@
+<!--pages/load/load.wxml-->
+<loading >
+    加载中...
+</loading>

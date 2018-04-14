@@ -22,5 +22,7 @@ if (!isset($_SERVER['PATH_INFO'])) {
     }
 // 定义应用目录
 define('APP_PATH', __DIR__ . '/apps/');
+// zjh 重新定义app的命名空间
+define('APP_NAMESPACE', 'apps');
 // 加载框架引导文件
 require __DIR__ . '/thinkphp/start.php';

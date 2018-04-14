@@ -1,0 +1,73 @@
+<!--pages/home/home.wxml-->
+<view class="container">
+
+  <!--店铺名称-->
+  <view class="title">
+    <text class="title-market">大西豪：</text>
+    <text class="title-store">101 蛮女孩牛仔</text>
+  </view>
+
+  <!--用户头像信息-->
+  <view class="userinfo">
+    <button wx:if="{{!hasUserInfo && canIUse}}" open-type="getUserInfo" bindgetuserinfo="getUserInfo" class="ahead"> 
+    <image class="userinfo-avatar" src="../common/image/head.png" ></image>
+   </button>
+    <block wx:else>
+      <image class="userinfo-avatar" src="{{userInfo.avatarUrl}}" background-size="cover"></image>
+    </block>
+  </view>
+
+  <!--手动入库选项-->
+  <view class="options" >
+    <image src="../common/image/second-bg@3x.png" class="options-bg" ></image>
+
+    <view class="manual-options" >
+      <text class="options-tip" >款式还没有同步过来？手动入库吧</text>
+      <view class="manual">
+        <button class="photo">
+          <image src="resource/image/photo@3x.png"></image>
+          <text>拍照</text>
+        </button>
+        <button class="speak">
+          <image src="resource/image/speak@3x.png"></image>
+          <text>说话</text>
+        </button>
+      </view>
+    </view>
+
+    <view style="clear:both;"></view> 
+  </view>
+
+  <!--最新库存列表-->
+  <block class="list">
+
+    <view class="list-head">
+      <text>已同步的最新款</text>
+      <input  style="width:{{inputWidth}}" bindinput="bindKeyInput" placeholder="款号..." bindfocus="inputFocus" bindblur="inputBlur"/>
+    </view>
+
+    <view class="list-body">
+
+      <block wx:for="{{[1, 2, 3,4,5,6,7,8,9]}}">
+        <view class="list-tab">
+          <view class="list-tab-image">
+            <image src="../common/image/cloth{{item%2}}.png"></image>
+          </view>
+
+          <view class="list-tab-content">
+            <text class="list-tab-text1"> 6199</text>
+            <text class="list-tab-text2">柳丁牛仔外套长袖女宽松上衣复古新春秋韩版百搭</text>
+          </view>
+
+          <view class="list-tab-operate">
+            <button class="mini-btn1" type="default" size="mini">入</button>
+            <button class="mini-btn2" type="default" size="mini">出</button>
+          </view>
+        </view>
+      </block>
+
+    </view>
+
+  </block>
+
+</view>

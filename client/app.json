@@ -1,10 +1,11 @@
 {
   "pages": [
-    "pages/index/index",
-    "pages/tp/tp",
+    "pages/load/load",
+    "pages/home/home",
+    "pages/store/store",
+    "pages/report/report",
+    "pages/index/index"
    
-    "pages/addCgi/addCgi"
-    
   ],
   "window": {
     "backgroundColor": "#F6F6F6",
@@ -12,5 +13,31 @@
     "navigationBarBackgroundColor": "#F6F6F6",
     "navigationBarTitleText": "小程序测试",
     "navigationBarTextStyle": "black"
+  },
+  "tabBar": {
+    "color": "#7A7E83",
+    "selectedColor": "#40bacf",
+    "borderStyle": "black",
+    "backgroundColor": "#ffffff",
+    "list": [
+      {
+        "pagePath": "pages/store/store",
+        "iconPath": "image/store@3x.png",
+        "selectedIconPath": "image/$store@3x.png",
+        "text": "我的档口"
+      },
+      {
+        "pagePath": "pages/home/home",
+        "iconPath": "image/home@3x.png",
+        "selectedIconPath": "image/$home@3x.png",
+        "text": "库存管理"
+      },
+      {
+        "pagePath": "pages/report/report",
+        "iconPath": "image/report@3x.png",
+        "selectedIconPath": "image/$report@3x.png",
+        "text": "我的报表"
+      }
+    ]
   }
 }

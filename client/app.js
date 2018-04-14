@@ -12,10 +12,25 @@ App({
             // 发送 res.code 到后台换取 openId, sessionKey, unionId
           }
         })
+
+        // zjh 存储 等待授权标识，默认为true，即等待，直到反馈是否已经授权
+        wx.setStorageSync('wait', true);
+        var wait = wx.getStorageSync('wait')
+        console.log('storage.wait...:'+wait);
+
         // 获取用户信息
         wx.getSetting({
           success: res => {
+            //zjh 变更等待标识，表示已经得到了是否已经授权的信息，所以无需再等待了
+            wx.setStorageSync('wait', false);
+            var wait = wx.getStorageSync('wait')
+            console.log('storage.wait.success...:'+wait);
+
+            console.log("getSetting.success.wait");
+
             if (res.authSetting['scope.userInfo']) {
+              this.globalData.auth = true;
+              console.log("auth.true");
               // 已经授权，可以直接调用 getUserInfo 获取头像昵称，不会弹框
               wx.getUserInfo({
                 success: res => {
@@ -27,13 +42,22 @@ App({
                   if (this.userInfoReadyCallback) {
                     this.userInfoReadyCallback(res)
                   }
+                  console.log("app.getUserInfo.success");
                 }
+
               })
             }
+          },
+          fail:res=>{
+            //zjh 变更等待标识，表示已经得到了是否已经授权的信息，所以无需再等待了
+            wx.setStorageSync('wait', false);
+            console.log('storage.wait.fail...:'+wait);
+            console.log("getSetting.fail.wait");
           }
         })
     },
     globalData: {
-      userInfo: null
+      userInfo: null,
+      auth: false
     }
 })

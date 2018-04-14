@@ -2,5 +2,12 @@
 composer.lock
 *.log
 thinkphp
-./vendor
+/vendor
 composer.phar
+/apps/extra
+
+.tags
+.tags_sorted_by_file
+
+/public/logs
+/logs

@@ -3,19 +3,184 @@ var qcloud = require('../../vendor/wafer2-client-sdk/index')
 var config = require('../../config')
 var util = require('../../utils/util.js')
 
+//获取应用实例
+var app = getApp()
+
 Page({
     data: {
         userInfo: {},
         logged: false,
         takeSession: false,
-        requestResult: ''
+        requestResult: '',
+        loginStatus:true
     },
     //zjh 直接跳转到tp页面
-    onShow: function () {
-      wx.redirectTo({
-        url: '../tp/tp',
-      })
+    // onShow: function () {
+    //   wx.redirectTo({
+    //     url: '../tp/tp',
+    //   })
+    // },
+    onLoad: function (options) {
+        console.log("index.begin");
     },
+
+    userInfoHandler:function(e){
+        if(e.detail.userInfo){
+            app.globalData.auth = true;
+            app.globalData.userInfo  = e.detail.userInfo;
+            //跳转
+            wx.reLaunch({
+              url: '/pages/home/home'
+            })
+        }
+        
+    },
+    auth2:function(){
+        wx.openSetting({success:(res)=>{console.log(res);}}); 
+    },
+   
+    auth1:function(){
+        // 获取用户信息
+        wx.getSetting({
+          success: res => {
+            console.log(4);
+            if (!res.authSetting['scope.userInfo']) {
+               console.log(5);
+              // 已经授权，可以直接调用 getUserInfo 获取头像昵称，不会弹框
+              wx.getUserInfo({
+                success: res => {
+                  // 可以将 res 发送给后台解码出 unionId
+                  app.globalData.userInfo = res.userInfo
+                  app.globalData.auth = true;
+                  // 由于 getUserInfo 是网络请求，可能会在 Page.onLoad 之后才返回
+                  // 所以此处加入 callback 以防止这种情况
+                  if (this.userInfoReadyCallback) {
+                    this.userInfoReadyCallback(res)
+                  }
+
+                  //跳转
+                    wx.switchTab({
+                      url: '/pages/home/home'
+                    })
+
+                }
+
+              })
+            }
+          }
+        })
+    },
+
+    //授权
+    auth: function () {
+        
+        wx.getSetting({
+
+            success(res) {
+                console.log(3);
+                if (!res.authSetting['scope.userInfo']) {
+                    wx.authorize({
+                        scope: 'scope.userInfo',
+                        success() {
+                            //平台登录
+                            console.log(3);
+                            app.globalData.auth = true;
+                            //跳转
+                            wx.switchTab({
+                              url: '/pages/home/home'
+                            })
+                        }
+                    })
+                }
+            }
+        })
+        console.log(3);
+    },
+
+    getPromission: function() {
+        var that = this;
+        console.log(that.data.loginStatuss);
+        if (!that.data.loginStatus) {
+          wx.openSetting({
+            success: function (res) {
+              if(res) {
+                if (res.authSetting["scope.userInfo"] == true) {
+                  that.data.loginStatus = true;
+                  wx.getUserInfo({
+                    withCredentials: false,
+                    success: function (res) {
+                      console.info("2成功获取用户返回数据");
+                      console.info(res.userInfo);
+                    },
+                    fail: function () {
+                      console.info("2授权失败返回数据");
+                    }              
+                    });
+                }
+              }         
+          },
+            fail: function () {
+              console.info("设置失败返回数据");
+            }        
+        });
+        }else {
+          wx.login({
+            success: function (res) {
+              if (res.code) { 
+                  wx.getUserInfo({
+                  withCredentials: false,
+                  success: function (res) {
+                    console.info("1成功获取用户返回数据");
+                    console.info(res.userInfo);
+                  },
+                  fail: function () {
+                    console.info("1授权失败返回数据");
+                    that.data.loginStatus = false;
+                    // 显示提示弹窗
+                    wx.showModal({
+                      title: '提示标题',
+                      content: '提示内容',
+                      success: function (res) {
+                        if (res.confirm) {
+                          console.log('用户点击确定')
+                        } else if (res.cancel) {
+                          wx.openSetting({
+                            success: function (res) {
+                              if (res) {
+                                if (res.authSetting["scope.userInfo"] == true) {
+                                  that.data.loginStatus = true;
+                                  wx.getUserInfo({
+                                    withCredentials: false,
+                                    success: function (res) {
+                                      console.info("3成功获取用户返回数据");
+                                      console.info(res.userInfo);
+                                    },
+                                    fail: function () {
+                                      console.info("3授权失败返回数据");
+                                    }                               
+                                });
+                                }
+                              }                         
+                          },
+                            fail: function () {
+                              console.info("设置失败返回数据");
+                            }                      
+                        });
+                        }
+                      }
+                    });
+                  }             
+              });
+              }
+            },
+            fail: function () {
+              console.info("登录失败返回数据");
+            }       
+        });
+        }
+      },
+
+
     
     // 用户登录示例
     login: function() {
