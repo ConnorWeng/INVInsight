@@ -1,6 +1,5 @@
 {
   "pages": [
-    "pages/load/load",
     "pages/home/home",
     "pages/store/store",
     "pages/report/report",

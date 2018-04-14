@@ -1,5 +1,10 @@
 <!--pages/home/home.wxml-->
-<view class="container">
+
+<loading wx:if="{{wait == true}}">
+    加载中...
+</loading>
+
+<view class="container" wx:else>
 
   <!--店铺名称-->
   <view class="title">
@@ -28,7 +33,7 @@
           <image src="resource/image/photo@3x.png"></image>
           <text>拍照</text>
         </button>
-        <button class="speak">
+        <button class="speak" open-type="getRecorderManager" bindgetrecordermanager="speak">
           <image src="resource/image/speak@3x.png"></image>
           <text>说话</text>
         </button>

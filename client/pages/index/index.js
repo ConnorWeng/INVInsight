@@ -21,7 +21,7 @@ Page({
     //   })
     // },
     onLoad: function (options) {
-        console.log("index.begin");
+        console.log("+++ index.begin +++");
     },
 
     userInfoHandler:function(e){
