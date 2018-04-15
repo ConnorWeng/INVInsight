@@ -9,4 +9,6 @@
 // | Author: yunwuxin <448901948@qq.com>
 // +----------------------------------------------------------------------
 
-return [];
+return [
+	'apps\api\command\Csm',    // zjh 创建 service  和 model 文件
+];
