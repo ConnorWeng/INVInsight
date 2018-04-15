@@ -1,0 +1,57 @@
+<!--pages/store/store.wxml-->
+<view class="container">
+
+  <!--店铺名称-->
+  <view class="title">
+    <text class="title-market">大西豪：</text>
+    <text class="title-store">101 蛮女孩牛仔</text>
+  </view>
+
+  <!--用户头像信息-->
+  <view class="userinfo">
+    <button wx:if="{{!hasUserInfo && canIUse}}" open-type="getUserInfo" bindgetuserinfo="getUserInfo" class="ahead"> 
+    <image class="userinfo-avatar" src="../common/image/head.png" ></image>
+   </button>
+    <block wx:else>
+      <image class="userinfo-avatar" src="{{userInfo.avatarUrl}}" background-size="cover"></image>
+    </block>
+  </view>
+
+  <!--背景图-->
+  <view class="bg" >
+    <image src="../common/image/second-bg@3x.png" class="image-bg" ></image>
+  </view>
+
+  <!--最新库存列表-->
+
+  <view class="list">
+    <view class="list-head">
+      <input  style="width:{{inputWidth}}" bindinput="bindKeyInput" placeholder="款号..." bindfocus="inputFocus" bindblur="inputBlur"/>
+    </view>
+
+    <view class="list-body">
+
+      <block wx:for="{{[1, 2, 3,4,5,6,7,8,9]}}">
+        <view class="list-tab">
+          <view class="list-tab-image">
+            <image src="../common/image/cloth{{item%2}}.png"></image>
+          </view>
+
+          <view class="list-tab-content">
+            <view class="list-tab-content1">
+              <text class="list-tab-text1"> 6190</text>
+            </view>
+            <view class="list-tab-content2">
+              <text class="list-tab-text2"> 入：1200</text>
+              <text class="list-tab-text2"> 出：120000</text>
+            </view>
+          </view>
+
+        </view>
+      </block>
+
+    </view>
+  </view>
+
+
+</view>

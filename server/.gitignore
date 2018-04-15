@@ -1,0 +1,13 @@
+.idea
+composer.lock
+*.log
+thinkphp
+/vendor
+composer.phar
+/apps/extra
+
+.tags
+.tags_sorted_by_file
+
+/public/logs
+/logs

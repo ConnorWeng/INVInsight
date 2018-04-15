@@ -1,0 +1,4 @@
+<!--index.wxml-->
+<image src="../common/image/first-bg@3x.png" class="container" ></image>
+<button class="login" open-type="getUserInfo" bindgetuserinfo="userInfoHandler" ><text>微信登录</text></button>
+
