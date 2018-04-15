@@ -304,6 +304,10 @@ class Csm extends Command
             return false;
         }
 
+        if(isset($array[4])){
+            $array[4] = 'id';
+        }
+
         $resources = '';
         for ($i=3; $i < count($array) ; $i++) { 
             $temp = explode('_', $array[$i]);  
