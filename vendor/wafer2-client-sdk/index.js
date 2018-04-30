@@ -8,6 +8,7 @@ var Signature = require('./lib/signature');  //zjh 2018-04-29
 var exports = module.exports = {
     login: login.login,
     setLoginUrl: login.setLoginUrl,
+    setDebug:request.setDebug,
     LoginError: login.LoginError,
 
     clearSession: Session.clear,

@@ -6,6 +6,8 @@ var Signature = require('./signature');  //zjh 2018-04-29
 
 var noop = function noop() {};
 
+var requestDebug = true;
+
 var buildAuthHeader = function buildAuthHeader(session) {
     var header = {};
 
@@ -55,6 +57,10 @@ function request(options) {
 
     // 失败回调
     var callFail = function (error) {
+        if(requestDebug){
+            error = JSON.stringify(error);
+        }
+        
         fail.call(null, error);
         complete.call(null, error);
     };
@@ -109,7 +115,12 @@ function request(options) {
                     }
 
                     message = '登录态已过期';
-                    error = new RequestError(data.error, message);
+                    if(requestDebug){
+                        error = new RequestError(data.code, message);
+                    }else{
+                        error = message;
+                    }
+                    
 
                     callFail(error);
                     return;
@@ -124,24 +135,70 @@ function request(options) {
                     }
 
                     message = '认证失败';
-                    error = new RequestError(data.error, message);
+                    if(requestDebug){
+                        error = new RequestError(data.code, message);
+                    }else{
+                        error = message;
+                    }
 
                     callFail(error);
                     return;
 
-                }else {
+                }else if(data && data.code === 0) {   //zjh 返回正确
+                    console.log('return arguments :');
+                    console.log(arguments);  
                     callSuccess.apply(null, arguments);
+
+                }else if(data && data.code === 999){  // 返回业务问题
+                    console.log('business issue :')
+                    console.log(data);
+                    message = data.issue.msg;
+
+                    if(requestDebug){
+                        error = new RequestError(data.issue.subcode, message);
+                    }else{
+                        error = message;
+                    }
+
+                    callFail(error);
+                }else{                            // 其他系统和接口层面的问题
+
+                    console.log('api fail :')
+                    console.log(data);
+
+                    if(data.message){
+                        message = data.message;
+                    }else{
+                        message = '请求失败';
+                    }
+                    
+                    if(requestDebug){
+                        error = new RequestError(data.code, message);
+                    }else{
+                        error = message;
+                    }
+
+                    callFail(error);
                 }
             },
 
-            fail: callFail,
+            fail: function (error) {
+                error = JSON.stringify(error);
+                callFail(error);
+            },
+            
             complete: noop,
         }));
     };
 
 };
 
+var setDebug = function (debug) {
+    requestDebug = debug;
+};
+
 module.exports = {
     RequestError: RequestError,
     request: request,
+    setDebug:setDebug
 };

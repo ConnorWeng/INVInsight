@@ -10,6 +10,9 @@ App({
         //zjh 设置签名密钥
         console.log('app signKey :'+config.signKey);
         qcloud.Signature.set(config.signKey);
+        //zjh 设置调试模式
+        qcloud.setDebug(config.debug) 
+        
         
         var session = qcloud.getSession();
         console.log('current session is : '+session);

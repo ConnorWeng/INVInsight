@@ -90,6 +90,8 @@ Page({
                                             url: config.service.usersUrl,
                                             login: true,
                                             success(result) {
+                                                console.log('result:');
+                                                console.log(result);
                                                 util.showSuccess('登录成功')
                                                 app.globalData.userInfo = result.data.data
                                                 that.setData({
@@ -99,11 +101,9 @@ Page({
                                             },
 
                                             fail(error) {
-                                                if(config.debug){
-                                                    util.showDebugModel('请求失败', error)
-                                                }else{
-                                                    util.showFail('请求失败，请检查网络状态')
-                                                }
+
+                                                util.showModel('请求失败', error)
+
                                                 console.log('request fail', error)
                                             }
                                         })
