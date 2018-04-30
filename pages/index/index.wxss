@@ -12,6 +12,14 @@ page {
   width: 100%;
 }
 
+.guide{
+  align-self: center;
+  position: absolute;
+  margin-top: 70%;
+  vertical-align:middle;
+  font-size: 30rpx;  
+}
+
 .login{
   align-self: center;
   position: absolute;

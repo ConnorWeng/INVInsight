@@ -1,10 +1,10 @@
 //index.js
-var qcloud = require('../../vendor/wafer2-client-sdk/index')
-var config = require('../../config')
-var util = require('../../utils/util.js')
 
 //获取应用实例
 var app = getApp()
+var qcloud = app.qcloud;
+var util = app.util;
+var config = app.config;
 
 Page({
     data: {
@@ -26,15 +26,73 @@ Page({
 
     userInfoHandler:function(e){
         if(e.detail.userInfo){
-            app.globalData.auth = true;
-            app.globalData.userInfo  = e.detail.userInfo;
-            //跳转
-            wx.reLaunch({
-              url: '/pages/home/home'
+       
+            util.showBusy('正在登录')
+            var that = this
+
+            // 调用登录接口
+            qcloud.login({
+                userinfo:e.detail,
+                success(result) {
+                    if (result) {
+                        util.showSuccess('登录成功')
+                        app.globalData.userInfo = result
+                        that.setData({
+                            userInfo: result,
+                            hasUserInfo: true
+                        })
+
+                        //跳转
+                        wx.reLaunch({
+                          url: '/pages/home/home'
+                        })
+                    } else {
+                        // 如果不是首次登录，不会返回用户信息，请求用户信息接口获取
+                        qcloud.request({
+                            url: config.service.usersUrl,
+                            login: true,
+                            success(result) {
+                                util.showSuccess('登录成功')
+                                app.globalData.userInfo = result.data.data
+                                that.setData({
+                                    userInfo: result.data.data,
+                                    hasUserInfo: true
+                                })
+
+                                //跳转
+                                wx.reLaunch({
+                                  url: '/pages/home/home'
+                                })
+                            },
+
+                            fail(error) {
+                                if(config.debug){
+                                    util.showDebugModel('请求失败', error)
+                                }else{
+                                    util.showModel('请求失败', '请求失败，请检查网络状态')
+                                }
+                                
+                                console.log('request fail', error)
+                            }
+                        })
+                    }
+                },
+
+                fail(error) {
+                    if(config.debug){
+                        util.showDebugModel('登录失败', error)
+                    }else{
+                        util.showModel('登录失败', '请检查网络状态')
+                    }
+                    
+                    console.log('登录失败', error)
+                }
             })
         }
         
     },
+
+
     auth2:function(){
         wx.openSetting({success:(res)=>{console.log(res);}}); 
     },

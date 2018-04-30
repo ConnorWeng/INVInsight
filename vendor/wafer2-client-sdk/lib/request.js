@@ -2,6 +2,7 @@ var constants = require('./constants');
 var utils = require('./utils');
 var Session = require('./session');
 var loginLib = require('./login');
+var Signature = require('./signature');  //zjh 2018-04-29
 
 var noop = function noop() {};
 
@@ -9,7 +10,7 @@ var buildAuthHeader = function buildAuthHeader(session) {
     var header = {};
 
     if (session) {
-        header[constants.WX_HEADER_SKEY] = session;
+        header[constants.WX_HEADER_SKEY.toLowerCase()] = session;
     }
 
     return header;
@@ -37,6 +38,8 @@ function request(options) {
         var message = '请求传参应为 object 类型，但实际传了 ' + (typeof options) + ' 类型';
         throw new RequestError(constants.ERR_INVALID_PARAMS, message);
     }
+
+    console.log('request begin');
 
     var requireLogin = options.login;
     var success = options.success || noop;
@@ -74,14 +77,29 @@ function request(options) {
     function doRequest() {
         var authHeader = buildAuthHeader(Session.get());
 
+        // zjh 处理签名
+        var time = Date.parse(new Date())/1000;
+        var timestamp = {timestamp:time};
+        var signParams = utils.extend({}, options.data, timestamp);
+        console.log("request signParams :");
+        console.log(signParams);
+        var signature = Signature.signature(signParams);
+        console.log("request outer mdsignture :"+signature);
+        //zjh 加入头部
+        authHeader['timestamp'] = time;
+        authHeader['signature'] = signature;
+
+        console.log('real request begin');
+
         wx.request(utils.extend({}, options, {
             header: utils.extend({}, originHeader, authHeader),
 
             success: function (response) {
                 var data = response.data;
-
+                console.log('request return :');
+                console.log(response);
                 var error, message;
-                if (data && data.code === -1) {
+                if (data && data.code === 451) {  //zjh 451代表登录态已经过期
                     Session.clear();
                     // 如果是登录态无效，并且还没重试过，会尝试登录后刷新凭据重新请求
                     if (!hasRetried) {
@@ -95,7 +113,23 @@ function request(options) {
 
                     callFail(error);
                     return;
-                } else {
+                } else if(data && data.code === 403){  //zjh 403 意味着本地的token与服务器上的不一致，则更新一下
+
+                    Session.clear();
+                    // 如果认证失败，并且还没重试过，会尝试登录后刷新凭据重新请求
+                    if (!hasRetried) {
+                        hasRetried = true;
+                        doRequestWithLogin();
+                        return;
+                    }
+
+                    message = '认证失败';
+                    error = new RequestError(data.error, message);
+
+                    callFail(error);
+                    return;
+
+                }else {
                     callSuccess.apply(null, arguments);
                 }
             },

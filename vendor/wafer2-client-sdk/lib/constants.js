@@ -4,6 +4,7 @@ module.exports = {
     WX_HEADER_IV: 'X-WX-IV',
     WX_HEADER_ID: 'X-WX-Id',
     WX_HEADER_SKEY: 'X-WX-Skey',
+    WX_HEADER_WITH_USERINFO : 'X-WX-With-Userinfo',
 
     WX_SESSION_MAGIC_ID: 'F2C224D4-2BCE-4C64-AF9F-A6D872000D1A',
 

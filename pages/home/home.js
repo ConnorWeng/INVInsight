@@ -1,6 +1,11 @@
 // pages/home/home.js
+
 //获取应用实例
 var app = getApp()
+var qcloud = app.qcloud;
+var util = app.util;
+var config = app.config;
+
 Page({
     /**
      * 页面的初始数据
@@ -16,9 +21,7 @@ Page({
      */
     onLoad: function(options) {
         console.log("+++ home.begin +++");
-        console.log(app.globalData.userInfo);
-        console.log('auth : '+app.globalData.auth);
-        
+
         var wait = wx.getStorageSync('wait');
         this.setData({
             wait: wait
@@ -36,12 +39,12 @@ Page({
                         console.log('load.wait...:' + res.data);
                         if (res.data === false) {
                             console.log("load.redirect");
-                            // zjh 没有授权，则跳转到需要授权的页面
-                            if (!app.globalData.auth) {
+                            // zjh 没有登录过，则跳转到初始引导和介绍的页面
+                            if (!app.globalData.hasLogin) {
                                 wx.reLaunch({
                                     url: "/pages/index/index"
                                 })
-                            } else { //zjh 有授权则跳转到home页面
+                            } else { //zjh 曾经登录过则跳转到home页面
                                 wx.reLaunch({
                                     url: '/pages/home/home'
                                 })
@@ -55,13 +58,6 @@ Page({
 
         }else{
 
-            // zjh 没有授权，则去授权
-            if (!app.globalData.auth) {
-                wx.reLaunch({
-                  url:"/pages/index/index"
-                })                
-            }
-
             console.log("+++ real home.begin +++");
 
             if (app.globalData.userInfo) {
@@ -69,37 +65,121 @@ Page({
                     userInfo: app.globalData.userInfo,
                     hasUserInfo: true
                 })
-            } else if (this.data.canIUse) {
-                // 由于 getUserInfo 是网络请求，可能会在 Page.onLoad 之后才返回
-                // 所以此处加入 callback 以防止这种情况
-                app.userInfoReadyCallback = res => {
-                    this.setData({
-                        userInfo: res.userInfo,
-                        hasUserInfo: true
-                    })
-                }
-            } else {
-                // 在没有 open-type=getUserInfo 版本的兼容处理
-                wx.getUserInfo({
+            }else{
+                wx.getSetting({   //zjh 获取设置信息
                     success: res => {
-                        app.globalData.userInfo = res.userInfo
-                        this.setData({
-                            userInfo: res.userInfo,
-                            hasUserInfo: true
-                        })
+
+                        if (res.authSetting['scope.userInfo']) {  // zjh 如果用户已经授权过
+                            // 已经授权则可以实现自动登录
+                            util.showBusy('正在登录')
+                            var that = this
+
+                            // 调用登录接口
+                            qcloud.login({
+                                success(result) {
+                                    if (result) {
+                                        util.showSuccess('登录成功')
+                                        app.globalData.userInfo = result
+                                        that.setData({
+                                            userInfo: result,
+                                            hasUserInfo: true
+                                        })
+                                    } else {
+                                        // 如果不是首次登录，不会返回用户信息，请求用户信息接口获取
+                                        qcloud.request({
+                                            url: config.service.usersUrl,
+                                            login: true,
+                                            success(result) {
+                                                util.showSuccess('登录成功')
+                                                app.globalData.userInfo = result.data.data
+                                                that.setData({
+                                                    userInfo: result.data.data,
+                                                    hasUserInfo: true
+                                                })
+                                            },
+
+                                            fail(error) {
+                                                if(config.debug){
+                                                    util.showDebugModel('请求失败', error)
+                                                }else{
+                                                    util.showFail('请求失败，请检查网络状态')
+                                                }
+                                                console.log('request fail', error)
+                                            }
+                                        })
+                                    }
+                                },
+
+                                fail(error) {
+                                    if(config.debug){
+                                        util.showDebugModel('登录失败', error)
+                                    }else{
+                                        util.showFail('登录失败')
+                                    }
+                                    console.log('登录失败', error)
+                                }
+                            })
+                        }
                     }
-                })
+                });
             }
+            
         }
 
-        console.log('each home auth : '+app.globalData.auth);
     },
     getUserInfo: function(e) {
         console.log(e)
-        app.globalData.userInfo = e.detail.userInfo
-        this.setData({
-            userInfo: e.detail.userInfo,
-            hasUserInfo: true
+
+        util.showBusy('正在登录')
+        var that = this
+
+        // 调用登录接口
+        qcloud.login({
+            userinfo:e.detail,
+            success(result) {
+                if (result) {
+                    util.showSuccess('登录成功')
+                    app.globalData.userInfo = result
+                    that.setData({
+                        userInfo: result,
+                        hasUserInfo: true
+                    })
+                } else {
+                    // 如果不是首次登录，不会返回用户信息，请求用户信息接口获取
+                    qcloud.request({
+                        url: config.service.usersUrl,
+                        login: true,
+                        success(result) {
+                            util.showSuccess('登录成功')
+                            app.globalData.userInfo = result.data.data
+                            that.setData({
+                                userInfo: result.data.data,
+                                hasUserInfo: true
+                            })
+                        },
+
+                        fail(error) {
+                            if(config.debug){
+                                util.showDebugModel('请求失败', error)
+                            }else{
+                                util.showModel('请求失败', '请求失败，请检查网络状态')
+                            }
+                            
+                            console.log('request fail', error)
+                        }
+                    })
+                }
+            },
+
+            fail(error) {
+                if(config.debug){
+                    util.showDebugModel('登录失败', error)
+                }else{
+                    util.showModel('登录失败', '请检查网络状态和是否已授权')
+                }
+                
+                console.log('登录失败', error)
+            }
         })
     },
     inputFocus: function() {

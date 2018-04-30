@@ -1,4 +1,5 @@
 <!--index.wxml-->
 <image src="../common/image/first-bg@3x.png" class="container" ></image>
+<view class="guide">欢迎使用库存小程序！请登录</view>
 <button class="login" open-type="getUserInfo" bindgetuserinfo="userInfoHandler" ><text>微信登录</text></button>
 

@@ -28,8 +28,14 @@ var showSuccess = text => wx.showToast({
     icon: 'success'
 })
 
+// 显示成功提示
+var showFail = text => wx.showToast({
+    title: text,
+    icon: 'none'
+})
+
 // 显示失败提示
-var showModel = (title, content) => {
+var showDebugModel = (title, content) => {
     wx.hideToast();
 
     wx.showModal({
@@ -39,4 +45,15 @@ var showModel = (title, content) => {
     })
 }
 
-module.exports = { formatTime, showBusy, showSuccess, showModel }
+// 显示失败提示
+var showModel = (title, content) => {
+    wx.hideToast();
+
+    wx.showModal({
+        title,
+        content: content,
+        showCancel: false
+    })
+}
+
+module.exports = { formatTime, showBusy, showSuccess, showFail,showModel ,showDebugModel}

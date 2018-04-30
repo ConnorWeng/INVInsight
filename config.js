@@ -3,8 +3,14 @@
  */
 
 // 此处主机域名修改成腾讯云解决方案分配的域名
-var host = 'https://vubyu8ns.qcloud.la';  //个人账号云服务器
-// var host = 'http://xtp.com:88';  //zjh 本地测试
+// var host = 'https://vubyu8ns.qcloud.la';  //个人账号云服务器
+// var host = 'http://mp.com:89';  //zjh 本地测试
+
+var host = 'http://192.168.1.106:89';  //zjh 局域网内测试
+
+var apiVersion = 'v1';   //api版本
+
+var generalUrl = `${host}/api/${apiVersion}`;  //配置通用url部分
 
 var config = {
 
@@ -12,21 +18,21 @@ var config = {
     service: {
         host,
 
+        generalUrl,
+
         // 登录地址，用于建立会话
-        loginUrl: `${host}/weapp/login`,
+        loginUrl: `${generalUrl}/auth/session`,
 
-        // 测试的请求地址，用于测试会话
-        requestUrl: `${host}/weapp/user`,
+        // 获取会话中的用户信息
+        usersUrl: `${generalUrl}/auth/users`,
 
-        // 测试的信道服务地址
-        tunnelUrl: `${host}/weapp/tunnel`,
+    },
 
-        // 上传图片接口
-        uploadUrl: `${host}/weapp/upload`,
+    //数字签名密钥
+    signKey:'mini_program_api_secret', 
 
-        //zjh 测试连通tp服务器
-        tpUrl: `${host}/api/index/index`
-    }
+    // 是否为调试模式
+    debug:true
 };
 
 module.exports = config;
