@@ -369,5 +369,16 @@ Page({
     /**
      * 用户点击右上角分享
      */
-    onShareAppMessage: function() {}
+    onShareAppMessage: function() {
+        return {
+          title: '库存管理小程序',
+          path: '/pages/home/home',
+          success: function(res) {
+            // 转发成功
+          },
+          fail: function(res) {
+            // 转发失败
+          }
+        }
+    }
 })
