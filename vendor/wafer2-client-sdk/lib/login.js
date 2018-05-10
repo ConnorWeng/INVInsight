@@ -61,29 +61,30 @@ var getWxLoginResult = function getLoginCode(callback) {
                 wx.getSetting({   //zjh 获取设置信息
                     success: res => {
 
-                        if (res.authSetting['scope.userInfo']) {  // zjh 如果用户已经授权过
+                        // if (res.authSetting['scope.userInfo']) {  // zjh 如果用户已经授权过
+                            // zjh 2018-04-30 该接口获取用户信息，微信已不再支持，用户信息统一通过外面的open-type传进来
+                            // 不再去执行下面函数
+                            // wx.getUserInfo({    
+                            //     success: function (userResult) {
+                            //         callback(null, {
+                            //             code: loginResult.code,
+                            //             encryptedData: userResult.encryptedData,
+                            //             iv: userResult.iv,
+                            //             userInfo: userResult.userInfo,
+                            //             withUserinfo: 'yes',
+                            //         });
 
-                            wx.getUserInfo({
-                                success: function (userResult) {
-                                    callback(null, {
-                                        code: loginResult.code,
-                                        encryptedData: userResult.encryptedData,
-                                        iv: userResult.iv,
-                                        userInfo: userResult.userInfo,
-                                        withUserinfo: 'yes',
-                                    });
+                            //         console.log('inner userinfo');
+                            //     },
 
-                                    console.log('inner userinfo');
-                                },
+                            //     fail: function (userError) {
+                            //         var error = new LoginError(constants.ERR_WX_GET_USER_INFO, '获取微信用户信息失败，请检查网络状态');
+                            //         error.detail = userError;
+                            //         callback(error, null);
+                            //     },
+                            // });
 
-                                fail: function (userError) {
-                                    var error = new LoginError(constants.ERR_WX_GET_USER_INFO, '获取微信用户信息失败，请检查网络状态');
-                                    error.detail = userError;
-                                    callback(error, null);
-                                },
-                            });
-
-                        }else{   //没有进行过授权，则不带用户信息去更新会话
+                        // }else{   //没有进行过授权，则不带用户信息去更新会话
 
                             callback(null, {
                                 code: loginResult.code,
@@ -93,7 +94,7 @@ var getWxLoginResult = function getLoginCode(callback) {
                                 withUserinfo: 'no',
                             });
                             console.log('login with no userinfo');
-                        }
+                        // }
                     },
                     fail: res => {
                         callback(null, {

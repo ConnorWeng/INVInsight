@@ -1,0 +1,6 @@
+{
+	"navigationBarTitleText": "出库",
+    "usingComponents": {
+    	"dialog": "../common/components/dialog/dialog"
+  	}
+}

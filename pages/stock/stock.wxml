@@ -1,0 +1,42 @@
+<!--pages/stock/stock.wxml-->
+
+<view class="container">
+
+  <!--库存列表-->
+  <block class="list">
+
+    <view class="list-head">
+      <text>我的库存</text>
+      <input  style="width:{{inputWidth}}" bindinput="bindKeyInput" placeholder="款号..." bindfocus="inputFocus" bindblur="inputBlur"/>
+    </view>
+
+    <view class="list-body">
+
+      <block wx:for="{{[1, 2, 3,4,5,6,7,8,9]}}">
+        <view class="list-tab">
+          <view class="list-tab-image">
+            <image src="../common/image/cloth{{item%2}}.png"></image>
+          </view>
+
+          <view class="list-tab-content">
+            <text class="list-tab-text1"> 6199</text>
+            <text class="list-tab-text2">库存：999</text>
+          </view>
+
+          <view class="list-tab-operate">
+            <button class="mini-btn1" type="default" size="mini" data-code="6199" data-id="1" bindtap="stockin">入</button>
+            <button class="mini-btn2" type="default" size="mini" data-code="6199" data-id="1" bindtap="stockout">出</button>
+          </view>
+          <view class="detail" bindtap="checkDetail" data-code="6199" data-id="1">
+            <image src="../common/image/detail.png" class="detail-image" />
+          </view>
+        </view>
+      </block>
+      <view class="weui-loadmore weui-loadmore_line">
+				<view class="weui-loadmore__tips weui-loadmore__tips_in-line">到最后啦</view>
+			</view>
+    </view>
+
+  </block>
+
+</view>

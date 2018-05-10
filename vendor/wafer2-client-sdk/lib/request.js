@@ -96,6 +96,7 @@ function request(options) {
         authHeader['signature'] = signature;
 
         console.log('real request begin');
+        console.log('request url : '+options.url);
 
         wx.request(utils.extend({}, options, {
             header: utils.extend({}, originHeader, authHeader),

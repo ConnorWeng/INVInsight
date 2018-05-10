@@ -1,0 +1,41 @@
+<!--pages/stockrecord/stockrecord.wxml-->
+
+<view class="page">
+    <view class="page-bd">
+        <view class="tab">
+            <view class="navbar">
+                <block wx:for="{{tabs}}" wx:key="*this">
+                    <view id="{{index}}" class="navbar-item {{activeIndex == index ? 'bar-item-on' : ''}}" bindtap="tabClick">
+                        <view class="navbar-title">{{item}}</view>
+                    </view>
+                </block>
+                <view class="slider" style="left: {{sliderLeft}}px; transform: translateX({{sliderOffset}}px); -webkit-transform: translateX({{sliderOffset}}px);"></view>
+            </view>
+            <view class="tab-panel">
+                <view class="tab-content" hidden="{{activeIndex != 0}}">
+                	<block wx:for="{{[1, 2, 3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]}}">
+                		<view class="time"><view class="time-content">2018-05-06 20:57</view></view>
+                		<view class="content"><image src="../common/image/in.png"/><text class="main">黑色,均码</text>  入库 <text class="main">8 </text>件 <text class="person">(操作人：Mr.Z)</text></view>
+                		<view class="line"></view>
+                	</block>
+                </view>
+                <view class="tab-content" hidden="{{activeIndex != 1}}">
+                	<block wx:for="{{[1, 2, 3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]}}">
+                		<view class="time"><view class="time-content">2018-05-06 20:57</view></view>
+                		<view class="content" wx:if="{{ item%2 == 0}}"><image src="../common/image/in.png"   /><text class="main">黑色,均码</text>  入库 <text class="main">8 </text>件 <text class="person">(操作人：Mr.Z)</text></view>
+
+                		<view class="content" wx:if="{{ item%2 == 1}}"><image src="../common/image/out.png"  /><text class="main">红色,S</text>  出库 <text class="main">3 </text>件 <text class="person">(操作人：Mr.Z)</text></view>
+                		<view class="line"></view>
+                	</block>
+                </view>
+                <view class="tab-content" hidden="{{activeIndex != 2}}">
+                	<block wx:for="{{[1, 2, 3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]}}">
+                		<view class="time"><view class="time-content">2018-05-06 20:57</view></view>
+                		<view class="content"><image src="../common/image/out.png"/><text class="main">红色,XL</text>  出库 <text class="main">8 </text>件 <text class="person">(操作人：Mr.Z)</text></view>
+                		<view class="line"></view>
+                	</block>
+                </view>
+            </view>
+        </view>
+    </view>
+</view>

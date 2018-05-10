@@ -1,0 +1,148 @@
+/* pages/stockdetail/stockdetail.wxss */
+
+.container{
+	width: 100%;
+	/*border:1px red solid;*/
+	margin-top: 32rpx;
+}
+
+.record{
+	width: 92%;
+	display: flex;
+	justify-content: flex-end;
+	/*border:1px red solid;*/
+	font-size: 32rpx;
+	color:#555;
+
+}
+
+.overview{
+	width: 94%;
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	/*border:1px red solid;*/
+	font-size: 36rpx;
+	margin-top: 24rpx;
+	color:#40bacf;
+}
+
+.code{
+	width: 45%;
+	border-right: 1px solid rgba(181, 178, 178, 0.3);
+	border-bottom: 1px solid rgba(181, 178, 178, 0.3);
+	padding-left: 24rpx;
+	padding-top:24rpx;
+	padding-bottom:24rpx;
+	/*font-weight: bold;*/
+	word-break: break-all; 
+    word-wrap:break-word;
+}
+
+.stockin-number{
+	width: 45%;
+	border-bottom: 1px solid rgba(181, 178, 178, 0.3);
+	padding-left: 24rpx;
+	padding-top:24rpx;
+	padding-bottom:24rpx;
+	word-break: break-all; 
+    word-wrap:break-word;
+}
+
+.total{
+	width: 45%;
+	border-right: 1px solid rgba(181, 178, 178, 0.3);
+	padding-left: 24rpx;
+	padding-top:24rpx;
+	padding-bottom:24rpx;
+	word-break: break-all; 
+    word-wrap:break-word;
+}
+
+.stockout-number{
+	width: 45%;
+	padding-left: 24rpx;
+	padding-top:24rpx;
+	padding-bottom:24rpx;
+	word-break: break-all; 
+    word-wrap:break-word;
+	
+}
+
+.detail{
+	width: 92%;
+	margin-bottom:80px;
+	/*border:1px red solid;*/
+	display: flex;
+	flex-direction: column;
+	margin-top: 32rpx;
+}
+
+.detail-title{
+	font-size: 36rpx;
+	font-weight: bold;
+}
+
+.detail-content{
+	font-size: 34rpx;
+	margin-top: 24rpx;
+
+}
+
+.detail-item{
+	display: flex;
+	align-items: center;
+	border-bottom:1px dotted rgba(181, 178, 178, 0.3);
+	margin-left: 32rpx;
+	padding: 18rpx 0;
+}
+
+.item-content{
+	word-break: break-all; 
+    word-wrap:break-word;
+}
+
+.item-number{
+	font-size:28rpx;
+    color:#888888;
+    padding-left:42rpx;
+    word-break: break-all; 
+    word-wrap:break-word;
+}
+
+.operate{
+
+    z-index: 999;
+    align:center;
+    position: fixed;
+    bottom: 0;
+    /*border: 1px red solid;*/
+    width: 100%;
+    height:135rpx;
+    background-color: white;
+    border:1px solid rgba(181, 178, 178, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content:center;
+}
+.stockin {
+    
+    width: 42%;
+    color:white;
+	background-color:#40bacf;
+    z-index: 1000;
+}
+
+.stockout {
+
+    width: 42%;
+    color:white;
+	background-color:#E64340;
+    z-index: 1000;
+
+
+}
+
+.button-hover{
+    opacity: 0.5;
+}

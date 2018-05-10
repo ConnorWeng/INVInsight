@@ -1,0 +1,17 @@
+<!--pages/speak/speak.wxml-->
+
+<view class="myToast" hidden="{{nullHouse}}">只能输入数字</view>
+<view bindtap="clickArea">点击此处</view>　
+
+<view class="container">
+    <dialog id='dialog' 
+      title='{{dialog.title}}'  
+      cancelText='取消' 
+      content='{{dialog.content}}'
+      confirm='确认'
+      bind:cancelEvent="_cancelEvent"  
+      bind:confirmEvent="_confirmEvent">
+    </dialog>
+    
+    <button type="primary" bindtap="showDialog"> ClickMe! </button>
+</view>　

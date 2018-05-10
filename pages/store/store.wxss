@@ -87,7 +87,7 @@
 .list-body{
   width:90%;
   margin-top: 30rpx;
-  
+  min-height: 500rpx;
 }
 
 .list-tab{
@@ -141,5 +141,21 @@
 .list-tab-text2{
   display: block;
   font-size: 8pt;
+}
+
+.myToast {
+    width:240rpx;
+  height:80rpx;
+  line-height:78rpx;
+  margin:386rpx 1%;
+  border-radius:8rpx;
+  background-color:rgb(114, 113, 113);
+  color:rgb(255, 255, 255);
+  font-size:30rpx;
+  text-align:center;
+  position:absolute;
+  z-index:1000;
+  opacity:0.95;
+
 }
 

@@ -14,6 +14,9 @@ Page({
         inputWidth: '150rpx',
         userInfo: {},
         hasUserInfo: false,
+        code:'',   //款号
+        nullHouse:true,
+        toast:'',
         canIUse: wx.canIUse('button.open-type.getUserInfo')
     },
     /**
@@ -182,6 +185,113 @@ Page({
             }
         })
     },
+
+    checkDetail:function(e){
+        console.log(e);
+
+        var code = e.currentTarget.dataset.code;
+        var id = e.currentTarget.dataset.id;
+
+        wx.navigateTo({
+          url: '../stockdetail/stockdetail?code='+code+'&stock_id='+id
+        })
+
+    },
+
+    stockin:function(e){
+
+        console.log(e);
+        var code = e.currentTarget.dataset.code;
+        var id = e.currentTarget.dataset.id;
+        if(code.length <= 0){
+            return;
+        }
+
+        //检测输入的是否为数字
+        var reg = /^[0-9]+$/;
+
+        if(!reg.test(code)){
+            util.showModel('只能输入数字','');
+            return;
+        }
+
+        wx.navigateTo({
+          url: '../stockin/stockin?code='+code+'&stock_id='+id
+        })
+    },
+
+    stockout:function(e){
+
+        console.log(e);
+
+        var code = e.currentTarget.dataset.code;
+        var id = e.currentTarget.dataset.id;
+
+        if(code.length <= 0){
+            return;
+        }
+
+        //检测输入的是否为数字
+        var reg = /^[0-9]+$/;
+
+        if(!reg.test(code)){
+            util.showModel('只能输入数字','');
+            return;
+        }
+
+        // id等于0时，先向网络查询一下是否有这个款，没有则return
+        if(id == 0){
+
+        }
+
+        wx.navigateTo({
+          url: '../stockout/stockout?code='+code+'&stock_id='+id
+        })
+    },
+
+    /**
+     * 检测输入
+     */
+    detectInput: function(e) {
+        console.log(e);
+        var input = e.detail.value;
+
+        if (e.detail.cursor > 0) {
+
+            //检测输入的是否为数字
+            var reg = /^[0-9]+$/;
+
+            if(!reg.test(e.detail.value)){
+
+                this.myToast('只能输入数字')
+
+            }
+          
+        }
+
+        this.setData({
+            code:input
+        })
+
+    },
+
+    /**
+     * 自定义提示
+     * @return  {[type]}  [description]
+     */
+    myToast: function(content) {
+        var that = this;
+        this.setData({
+            nullHouse: false, //弹窗显示
+            toast:content
+        })
+        setTimeout(function() {
+            that.setData({
+                nullHouse: true,
+            }) //1秒之后弹窗隐藏
+        }, 1500)
+    },
+
     inputFocus: function() {
         this.setData({
             inputWidth: '250rpx',

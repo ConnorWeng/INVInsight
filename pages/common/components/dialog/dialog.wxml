@@ -1,0 +1,20 @@
+<!--pages/common/components/dialog/dialog.wxml-->
+
+<view class='wx_dialog_container' hidden="{{!isShow}}">
+    <view class='wx-mask'></view>
+    <view class='wx-dialog'>
+        <view class='wx-dialog-title'>{{ title }}</view>
+        <view class="wx-content">
+	        <block wx:for="{{content}}">
+		        <view class='wx-dialog-content'>
+		        	<image class="image-content" src="../../image/{{item.image}}"></image>
+		        	<view class="main-content">{{item.content}}</view>
+		        </view>
+	    	</block>
+    	</view>
+        <view class='wx-dialog-footer'>
+          <view class='wx-dialog-btn' catchtap='_cancelEvent'>{{ cancelText }}</view>
+          <view class='wx-dialog-btn' catchtap='_confirmEvent'>{{ confirmText }}</view>
+        </view>
+    </view>
+</view>

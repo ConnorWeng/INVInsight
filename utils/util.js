@@ -56,4 +56,20 @@ var showModel = (title, content) => {
     })
 }
 
-module.exports = { formatTime, showBusy, showSuccess, showFail,showModel ,showDebugModel}
+// 显示提示
+var showTip = (title,content,action)=>{
+    wx.hideToast();
+
+    wx.showModal({
+        title,
+        content: content,
+        success:function(res){
+          if(res.confirm){
+            action();
+          }
+        }
+    })
+}
+
+
+module.exports = { formatTime, showBusy, showSuccess, showFail,showModel ,showDebugModel,showTip}

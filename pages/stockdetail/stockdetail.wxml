@@ -1,0 +1,36 @@
+<!--pages/stockdetail/stockdetail.wxml-->
+
+<view class="container">
+
+	<!--操作记录-->
+	<view class="record" bindtap="checkRecord">操作记录</view>
+
+	<!--库存信息概览-->
+	<view class="overview ">
+		<view class="code">款号：{{code}}</view>
+		<view class="stockin-number">入库：12 </view>
+		<view class="total">库存：45</view>
+		<view class="stockout-number">出库：2</view>
+	</view>
+
+	<!--详情-->
+	<view class="detail">
+		<view class="detail-title">详情</view>
+		<view class="detail-content">
+			<block wx:for="{{[1, 2, 3,4,5,6,7,8,9,10,11,12,13,14]}}">
+				<view class="detail-item">
+					<view class="item-content">红色 , S</view>
+					<view class="item-number">库存量：12</view>
+				</view>
+			</block>
+		</view>
+	</view>
+
+	<!--出入库操作-->
+	<view class="operate">
+		<button class="stockin" hover-class="button-hover" bindtap="stockin">入库</button>
+		<button class="stockout" hover-class="button-hover" bindtap="stockout">出库</button>
+	</view>
+
+</view>
+

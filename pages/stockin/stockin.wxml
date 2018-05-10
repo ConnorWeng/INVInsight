@@ -1,0 +1,77 @@
+<!--pages/stockin/stockin.wxml-->
+
+<view class="container">
+
+  <view class="title">入库款号：<text class="code">{{code}}</text></view>
+  <form bindsubmit="formSubmit" id="stockin" class="stockin-form">
+
+    <view class="form-section" style="display:none">
+      <input type="text" name="product_code" value="{{code}}" />
+    </view>
+
+    <view class="form-section">
+
+      <view class="custom">自定义输入</view>
+      
+      <view class="size-color">
+        
+        <view class="color">
+          <picker bindchange="pickerColorChange" style="{{color.picker.display}}" name="{{color.picker.name}}" value="{{colorIndex}}" range="{{colorArray}}">
+            <view class="picker">
+              <view class="color-title">颜色</view><view class="color-content">{{colorArray[colorIndex]}}</view>
+            </view>
+          </picker>
+          <view class="input" style="{{color.input.display}}" ><image src="../common/image/input.png"></image><input placeholder="颜色 ..."  type="text" name="{{color.input.name}}" value=""/></view>
+          <view class="custom-switch" >
+            <switch bindchange="colorCustom" name="color_switch" color="#40bacf"/>
+          </view>
+        </view>
+
+        <view class="size">
+          <picker bindchange="pickerSizeChange" style="{{size.picker.display}}" name="{{size.picker.name}}" value="{{sizeIndex}}" range="{{sizeArray}}">
+            <view class="picker">
+              <view class="size-title">尺码</view><view class="size-content">{{sizeArray[sizeIndex]}}</view>
+            </view>
+          </picker>
+          <view class="input" style="{{size.input.display}}" ><image src="../common/image/input.png"></image><input placeholder="尺码 ..." type="text" name="{{size.input.name}}" value="" /></view>
+          <view class="custom-switch">
+            <switch bindchange="sizeCustom" name="size_switch" color="#40bacf"/>
+          </view>
+        </view>
+        
+      </view>
+
+    </view>
+
+    <view class="form-section">
+      <view class="stock-number">
+        <label>入库</label>
+        <input class="input-number" type="number" name="number" value="{{number}}" bindblur="inputChange"/>
+        <label>件</label>
+      </view>
+      <view class="slider">
+        <image src="../common/image/minus.png" class="minus" bindtap="minusCount"></image>
+        <slider bindchange="sliderchange" min="1" max="{{sliderMax}}" value="{{sliderValue}}" show-value  class="main-slider" activeColor="#40bacf" block-color="#40bacf"/>
+        <image src="../common/image/add.png" class="add" bindtap="addCount" ></image>
+      </view>
+
+    </view>
+
+    <view class="btn-area">
+      <button formType="submit" id="confirm" class="normal-btn"  hover-class="normal-hover">提交</button>
+      <button formType="submit" id="photo_confirm" class="photo-btn" hover-class="photo-hover">拍照并提交</button>
+    </view>
+
+  </form>
+
+  <dialog id='dialog' 
+      title='{{dialog.title}}'  
+      cancelText='取消' 
+      content='{{dialog.content}}'
+      confirm='确认'
+      bind:cancelEvent="_cancelEvent"  
+      bind:confirmEvent="_confirmEvent">
+  </dialog>
+
+</view>
+

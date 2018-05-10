@@ -1,0 +1,80 @@
+<!--pages/findstock/findstock.wxml-->
+<view class="container">
+	<view class="myToast" hidden="{{nullHouse}}">{{toast}}</view>
+	<view class="head">
+		<veiw class="head-content">
+			<image src="../common/image/search.png" class="head-image"></image>
+			<input class="head-input" name="search" value="{{inputValue}}" placeholder="请输入款号" bindinput="detectInput" bindconfirm="inputConfirm"/>
+			<image src="../common/image/close.png" class="head-close" wx:if="{{showCloseBtn == true}}" bindtap="emptyInput"></image>
+		</veiw>
+		<view class="head-search" style="color:{{searchColor}};" bindtap="searchConfirm" data-value="{{searchValue}}" >搜索</view>
+	</view>
+	<view class="body">
+
+		<!--ready状态下的搜索历史界面-->
+		<view class="histroy" wx:if="{{status == 'ready'}}">
+			<view class="history-head">
+				<veiw class="history-title">历史搜索</veiw>
+				<veiw class="history-delete" bindtap="deleteHistory" hover-class="button-hover"><image class="delete-image" src="../common/image/delete.png" ></image></veiw>
+			</view>
+
+			<view class="history-content">
+				<block wx:for="{{historyData}}">
+					<view class="preview-item" bindtap="previewItemSearch" data-value="{{item.value}}" wx:if="{{item.type == 'preview'}}">{{item.value}}</view>
+
+					<view class="detail-item" wx:if="{{item.type == 'detail'}}" bindtap="detailItemSearch" data-value="{{item.value}}">
+						<image class="item-icon" src="../common/image/history-item.png"></image>
+						<view class="item-name">{{item.value}}</view>
+					</view>
+
+				</block>
+			</view>
+		</view>
+
+		<!--doing状态下的预查询界面-->
+		<view class="quick-search" wx:if="{{status == 'doing'}}">
+			<block wx:for="{{quickSearch}}" wx:for-index="index">
+				<view class="quick-item" bindtap="viewDetail" data-id="{{item.stock_id}}" data-code="{{item.product_code}}">
+					<image src="../common/image/history-item.png" class="quick-item-image"></image>
+					<view class="quick-item-title">
+						<block wx:for="{{item.product_code}}" wx:for-index="k" wx:for-item="i" >
+							<text style="color:#40bacf" wx:if="{{quickSign[index][k] == 1}}">{{i}}</text>
+							<text wx:else >{{i}}</text>
+						</block>
+					</view>
+					<view class="quick-item-number">库存量：{{item.stock_amount}}</view>
+				</view>
+			</block>
+		</view>
+
+		<!--done状态下的搜索结果界面-->
+		<view class="search-result" wx:if="{{status == 'done'}}">
+
+			<block wx:for="{{[1, 2, 3,4,5]}}">
+				<view class="list-tab">
+
+					<view class="list-tab-image">
+						<image src="../common/image/cloth{{item%2}}.png"></image>
+					</view>
+
+					<view class="list-tab-content">
+						<text class="list-tab-text1"> 6199</text>
+						<text class="list-tab-text2">库存：999</text>
+					</view>
+
+					<view class="list-tab-operate">
+						<button class="mini-btn1" type="default" size="mini" bindtap="stockin" data-code="6199"  data-id="1">入</button>
+						<button class="mini-btn2" type="default" size="mini" bindtap="stockout" data-code="6199"  data-id="1">出</button>
+					</view>
+
+					<view class="detail" data-code="6199"  data-id="1" bindtap="checkDetail">
+						<image src="../common/image/detail.png" class="detail-image" />
+					</view>
+
+				</view>
+			</block>
+
+		</view>
+
+	</view>
+</view>

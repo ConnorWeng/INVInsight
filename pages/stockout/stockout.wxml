@@ -1,0 +1,61 @@
+<!--pages/stockout/stockout.wxml-->
+
+<view class="container">
+
+  <view class="title">出库款号：<text class="code">{{code}}</text></view>
+
+<!--   <view class="weui-loadmore">
+		<view class="weui-loading"></view>
+		<view class="weui-loadmore__tips">正在加载</view>
+	</view>
+
+  <view class="weui-loadmore weui-loadmore_line">
+		<view class="weui-loadmore__tips weui-loadmore__tips_in-line">该款号暂无库存</view>
+	</view> -->
+
+  <form bindsubmit="formSubmit" id="stockout" class="outform">
+
+    <view class="form-section" style="display:none">
+      <input type="text" name="product_code" value="{{code}}" />
+    </view>
+
+    <view class="form-section">
+    	<checkbox-group bindchange="checkboxChange" name="check">
+		  <block  wx:for="{{items}}">
+		  	<view class="checkbox">
+
+		  		<view class="main-content">
+				  	<checkbox value="{{item.id}}" data-check="{{item.check}}" id="{{item.id}}" color="{{item.checkbox_color}}" bindtap="bindcheck" color="#40bacf"></checkbox>
+
+				    <text class="sku" style="{{item.color_style}}">{{item.color}},{{item.size}}</text>
+				    <text class="total" style="{{item.color_style}}">(库存量：{{item.stock_amount}})</text>
+				</view>
+			    <view class="number">
+			    	<image src="../common/image/minus.png" class="minus" bindtap="minusCount" data-num="{{item.id}}" id="minus_mage_{{item.id}}"></image>
+			    	<input  type="number" name="sku_{{item.id}}" value="{{item.number}}" style="{{item.color_style}}" bindblur="inputChange" data-id="{{item.id}}"/>
+			    	<image src="../common/image/add.png" class="add" bindtap="addCount" data-num="{{item.id}}" id="add_mage_{{item.id}}"></image>
+			    </view>
+			</view>
+		  </block>
+		</checkbox-group>
+
+    </view>
+
+    <view class="btn-area">
+      <button formType="submit" id="confirm" style="{{buttonColor}}" class="btn" hover-class="button-hover">出库</button>
+    </view>
+
+  </form>
+
+  <dialog id='dialog' 
+      title='{{dialog.title}}'  
+      cancelText='取消' 
+      content='{{dialog.content}}'
+      confirm='确认'
+      bind:cancelEvent="_cancelEvent"  
+      bind:confirmEvent="_confirmEvent">
+  </dialog>
+  
+</view>
+
+
