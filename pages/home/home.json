@@ -1,1 +1,7 @@
-{}
+{
+	"enablePullDownRefresh":true,
+	"usingComponents": {
+        "loading":"../common/components/loading/loading",
+        "cover":"../common/components/cover/cover"
+  	}
+}

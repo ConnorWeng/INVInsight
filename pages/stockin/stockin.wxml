@@ -46,7 +46,7 @@
     <view class="form-section">
       <view class="stock-number">
         <label>入库</label>
-        <input class="input-number" type="number" name="number" value="{{number}}" bindblur="inputChange"/>
+        <input class="input-number" type="number" name="stock_amount" value="{{number}}" bindblur="inputChange"/>
         <label>件</label>
       </view>
       <view class="slider">
@@ -71,6 +71,15 @@
       confirm='确认'
       bind:cancelEvent="_cancelEvent"  
       bind:confirmEvent="_confirmEvent">
+  </dialog>
+
+  <dialog id='err_dialog' 
+      title='{{dialog.title}}'  
+      cancelText='取消' 
+      content='{{dialog.content}}'
+      confirm='确认'
+      bind:cancelEvent="_noEvent"  
+      bind:confirmEvent="_noEvent">
   </dialog>
 
 </view>

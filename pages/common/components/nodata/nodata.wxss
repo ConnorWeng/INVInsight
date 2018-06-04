@@ -1,0 +1,3 @@
+/* pages/common/components/nodata/nodata.wxss */
+
+@import '../../lib/weui.wxss';

@@ -19,6 +19,8 @@ Page({
         'searchValue':'',
         'historyData':[],
         'quickSearch':[],
+        'result':[],
+        'hasSearch':false,
         'quickSign':[],
         'loading':false,
         'nullHouse':true,
@@ -30,66 +32,65 @@ Page({
      */
     onLoad: function(options) {
         //例子，对接后台后删除 zjh
-        var history = [
-            {
-                'type':'preview',
-                'value':'1224'
-            },
-            {
-                'type':'detail',
-                'id':'2',
-                'value':'4532'
-            },
-            {
-                'type':'preview',
-                'value':'243'
-            },
-        ];
+        // var history = [
+        //     {
+        //         'type':'preview',
+        //         'value':'1224'
+        //     },
+        //     {
+        //         'type':'detail',
+        //         'id':'2',
+        //         'value':'4532'
+        //     },
+        //     {
+        //         'type':'preview',
+        //         'value':'243'
+        //     },
+        // ];
 
-        //例子
-        var quick = [
-            {
-                'stock_id':4,
-                'product_code':'34556',
-                'stock_amount':25
-            },
-            {
-                'stock_id':3,
-                'product_code':'3556',
-                'stock_amount':2
-            },
-            {
-                'stock_id':1,
-                'product_code':'111156',
-                'stock_amount':12
-            },
-            {
-                'stock_id':4,
-                'product_code':'78556',
-                'stock_amount':25
-            },
+        // //例子
+        // var quick = [
+        //     {
+        //         'stock_id':4,
+        //         'product_code':'34556',
+        //         'stock_amount':25
+        //     },
+        //     {
+        //         'stock_id':3,
+        //         'product_code':'3556',
+        //         'stock_amount':2
+        //     },
+        //     {
+        //         'stock_id':1,
+        //         'product_code':'111156',
+        //         'stock_amount':12
+        //     },
+        //     {
+        //         'stock_id':4,
+        //         'product_code':'78556',
+        //         'stock_amount':25
+        //     },
 
 
           
 
-        ];
+        // ];
 
 
-        wx.setStorageSync('searchHistory', history);
+        // wx.setStorageSync('searchHistory', history);
 
         this.data.historyData = wx.getStorageSync('searchHistory')
 
         this.setData({
-            historyData:this.data.historyData,
+            historyData:this.data.historyData?this.data.historyData:[],
             status:'ready',          //临时切换状态
-            quickSearch:quick
         })
 
     },
 
     stockin:function(e){
 
-        console.log(e);
+        util.mylog(e);
         var code = e.currentTarget.dataset.code;
         var id = e.currentTarget.dataset.id;
 
@@ -102,7 +103,7 @@ Page({
 
     stockout:function(e){
 
-        console.log(e);
+        util.mylog(e);
 
         var code = e.currentTarget.dataset.code;
         var id = e.currentTarget.dataset.id;
@@ -113,7 +114,7 @@ Page({
     },
 
     checkDetail:function(e){
-        console.log(e);
+        util.mylog(e);
 
         var code = e.currentTarget.dataset.code;
         var id = e.currentTarget.dataset.id;
@@ -128,7 +129,7 @@ Page({
      * 检测输入
      */
     detectInput: function(e) {
-        console.log(e);
+        util.mylog(e);
         var input = e.detail.value;
 
         if (e.detail.cursor > 0) {
@@ -171,17 +172,19 @@ Page({
                 }
             }
 
-            this.setData({
-                quickSearch:this.data.quickSearch,
-                status:tmpstatus,          //切换状态
-                quickSign:this.data.quickSign
-            });
+            //暂时没有模糊查询，所以暂时屏蔽
+            // this.setData({
+            //     quickSearch:this.data.quickSearch,
+            //     status:tmpstatus,          //切换状态
+            //     quickSign:this.data.quickSign
+            // });
         }else{
             this.setData({
                 showCloseBtn:false,
                 searchColor:'',
                 searchValue:input,
                 status:'ready',          //切换状态
+                hasSearch:false,
                 quickSign:[]
             })
         }
@@ -230,7 +233,7 @@ Page({
             this.data.quickSign[k] = this.createSign(codeStr,len,pos);
         }
         
-        console.log('quickSign : ',this.data.quickSign)
+        util.mylog('quickSign : ',this.data.quickSign)
 
     },
 
@@ -293,6 +296,7 @@ Page({
         this.setData({
             inputValue:'',
             showCloseBtn:false,
+            hasSearch:false,
             searchColor:'',
             status:'ready',          //切换状态
             searchValue:''
@@ -305,7 +309,7 @@ Page({
      * @return  {[type]}     [description]
      */
     previewItemSearch:function(e){
-        console.log(e);
+        util.mylog(e);
 
         if(this.data.loading){  //loading期间，冻结按钮
             return;
@@ -329,10 +333,8 @@ Page({
         })
 
         //网络查询 zjh
-        //this.search();
-        this.data.loading = false;  //结束loading，解冻其他按钮
-        //隐藏加载动画
-        wx.hideNavigationBarLoading()
+        this.searchProduct(e.currentTarget.dataset.value);
+
     },
 
     /**
@@ -341,7 +343,7 @@ Page({
      * @return  {[type]}     [description]
      */
     detailItemSearch:function(e){
-        console.log(e);
+        util.mylog(e);
 
         if(this.data.loading){  //loading期间，冻结按钮
             return;
@@ -393,16 +395,16 @@ Page({
             
         }
 
-        console.log('search history current size ：' + this.data.historyData.length);
-        console.log('search history allow maxsize ：' + historySize);
+        util.mylog('search history current size ：' + this.data.historyData.length);
+        util.mylog('search history allow maxsize ：' + historySize);
         if(this.data.historyData.length > historySize){
             var diff = this.data.historyData.length - historySize;
-            console.log('search history over size ：' + diff);
+            util.mylog('search history over size ：' + diff);
             //删除超过存储最大值后的数目
             this.data.historyData.splice(historySize, diff);
 
         }
-        console.log(this.data.historyData);
+        util.mylog(this.data.historyData);
         wx.setStorageSync('searchHistory', this.data.historyData);
     },
 
@@ -412,7 +414,7 @@ Page({
      * @return  {[type]}     [description]
      */
     searchConfirm:function(e){
-        console.log(e);
+        util.mylog(e);
 
         var value = e.currentTarget.dataset.value;
 
@@ -424,7 +426,7 @@ Page({
      */
     
     inputConfirm:function(e){
-        console.log(e)
+        util.mylog(e)
 
         var value = e.detail.value;
 
@@ -466,22 +468,66 @@ Page({
             this.updateHistory('preview',value,'');
 
             this.setData({
-                historyData:this.data.historyData
+                historyData:this.data.historyData,
+                status:'done',          //切换状态
             })
 
             
-
             //网络查询 zjh
-            //this.search();
-            //网络查询结果后
-            this.setData({
-                status:'done',          //切换状态
-            })
+            this.searchProduct(value);
+
         }
 
-        this.data.loading = false;  //结束loading，解冻其他按钮
-        //隐藏加载动画
-        // wx.hideNavigationBarLoading()
+    },
+
+
+    /**
+     * 查询货号
+     * @param   {[type]}  code  [description]
+     * @return  {[type]}        [description]
+     */
+    searchProduct:function(code){
+        //显示加载动画
+        wx.showNavigationBarLoading();
+
+        var that = this;
+
+        qcloud.request({
+            url: config.service.generalUrl+'/search?product_code='+code,
+            login: true,
+            method:'GET',
+            success(result) {
+                util.mylog('result Data : ',result);
+                var res = result.data;
+                //隐藏加载动画
+                wx.hideNavigationBarLoading()
+                // util.showSuccess('查找成功')
+                that.data.result = [];
+                if(res.data.stock){
+                    that.data.result.push(res.data.stock);
+                }
+
+                that.setData({
+                    hasSearch:true,
+                    result:that.data.result,
+                    
+                })
+
+                that.data.loading = false;  //结束loading，解冻其他按钮
+            },
+
+            fail(error) {
+
+                //隐藏加载动画
+                wx.hideNavigationBarLoading()
+                that.setData({
+                    hasSearch:true, 
+                    result:[]       
+                })
+                that.data.loading = false;  //结束loading，解冻其他按钮
+                // util.showDebugModel('查找失败', error)
+            }
+        })
     },
 
     /**
@@ -526,7 +572,7 @@ Page({
      * @return  {[type]}     [description]
      */
     viewDetail:function(e){
-        console.log(e);
+        util.mylog(e);
 
         if(this.data.loading){  //loading期间，冻结按钮
             return;
@@ -542,14 +588,6 @@ Page({
         //跳转到项目详情页
     },
 
-    /**
-     * 网络查询
-     * @param   {[type]}  e  [description]
-     * @return  {[type]}     [description]
-     */
-    search:function(e){
-        //zjh 向服务器后台获取查询结果
-    },
 
     /**
      * 生命周期函数--监听页面初次渲染完成

@@ -7,9 +7,13 @@
 <view class="container" wx:else>
   <view class="myToast" hidden="{{nullHouse}}">{{toast}}</view>
   <!--店铺名称-->
-  <view class="title">
-    <text class="title-market">大西豪：</text>
-    <text class="title-store">101 蛮女孩牛仔</text>
+  <view class="title" wx:if="{{hasHomeData}}">
+    <text class="title-market">{{storeInfo.market_name}} : </text>
+    <text class="title-store">{{storeInfo.store_name}}</text>
+  </view>
+  <view class="title" wx:else>
+    <text class="title-market">市场 : </text>
+    <text class="title-store">店铺</text>
   </view>
 
   <!--用户头像信息-->
@@ -36,7 +40,7 @@
             <button class="photo-mini-btn2" type="default" size="mini" data-code="{{code}}" data-id="0" hover-class="button-hover" bindtap="stockout">出</button>
           </view>
         </button>
-        <button class="speak" open-type="getRecorderManager" bindgetrecordermanager="speak" >
+        <button class="speak" open-type="getRecorderManager" bindgetrecordermanager="speak"  bindtap="speakManage">
           <image src="resource/image/speak@3x.png"></image>
           <text>说话</text>
         </button>
@@ -51,34 +55,45 @@
 
     <view class="list-head">
       <text>我的库存</text>
-      <navigator url="../stock/stock" hover-class="navigator-hover"><image src="../common/image/all.png" class="all"/></navigator>
-      <!-- <input  style="width:{{inputWidth}}" bindinput="bindKeyInput" placeholder="款号..." bindfocus="inputFocus" bindblur="inputBlur"/> -->
+      <!-- <navigator url="../stock/stock" hover-class="navigator-hover"><image src="../common/image/all.png" class="all"/></navigator> -->
+      <input placeholder="款号..." bindtap="inputFocus" disabled="true"/>
     </view>
 
-    <view class="list-body">
+    <view class="list-body"  wx:if="{{stocks === undefined || stocks.length == 0}}">
+      <loading wx:if="{{!hasHomeData && hasUserInfo}}"></loading>
+      <view class="weui-loadmore weui-loadmore_line" wx:if="{{!hasUserInfo}}">
+        <view class="weui-loadmore__tips weui-loadmore__tips_in-line">请登录</view>
+      </view>
+      <view class="weui-loadmore weui-loadmore_line" wx:if="{{hasHomeData}}">
+        <view class="weui-loadmore__tips weui-loadmore__tips_in-line">没有数据</view>
+      </view>
+    </view>
 
-      <block wx:for="{{[1, 2, 3,4,5,6,7,8,9]}}">
+    <view class="list-body" wx:else>
+
+      <block wx:for="{{stocks}}">
         <view class="list-tab">
           <view class="list-tab-image">
-            <image src="../common/image/cloth{{item%2}}.png"></image>
+            <image src="{{item.product.thumbnail}}" wx:if="{{item.product.thumbnail}}"></image>
+            <image src="../common/image/cloth0.png" wx:else></image>
           </view>
 
           <view class="list-tab-content">
-            <text class="list-tab-text1"> 6199</text>
-            <text class="list-tab-text2">库存：999</text>
+            <text class="list-tab-text1">{{item.product.product_code}}</text>
+            <text class="list-tab-text2">库存：{{item.stock_amount}}</text>
           </view>
 <!-- 柳丁牛仔外套长袖女宽松上衣复古新春秋韩版百搭 -->
           <view class="list-tab-operate">
-            <button class="list-mini-btn1" type="default" size="mini" bindtap="stockin" data-code="6199"  data-id="1">入</button>
-            <button class="list-mini-btn2" type="default" size="mini" bindtap="stockout" data-code="6199"  data-id="1">出</button>
+            <button class="list-mini-btn1" type="default" size="mini" bindtap="stockin" data-code="{{item.product.product_code}}"  data-id="{{item.stock_id}}">入</button>
+            <button class="list-mini-btn2" type="default" size="mini" bindtap="stockout" data-code="{{item.product.product_code}}"  data-id="{{item.stock_id}}">出</button>
           </view>
-          <view class="detail" data-code="6199"  data-id="1" bindtap="checkDetail">
+          <view class="detail" data-code="{{item.product.product_code}}"  data-id="{{item.stock_id}}" bindtap="checkDetail">
             <image src="../common/image/detail.png" class="detail-image" />
           </view>
         </view>
       </block>
 
-      <navigator url="../stock/stock" hover-class="navigator-hover" class="navigator"><image src="../common/image/more.png" class="more"/></navigator>
+      <navigator url="../stock/stock" hover-class="navigator-hover" class="navigator"><view class="more">查看全部</view></navigator>
 
     </view>
 
@@ -92,34 +107,43 @@
       <text>已同步的最新款式</text>
     </view>
 
-    <view class="goods-body">
+    <view class="goods-body"  wx:if="{{products === undefined || products.length == 0}}">
+      <loading wx:if="{{!hasHomeData && hasUserInfo}}"></loading>
+      <view class="weui-loadmore weui-loadmore_line" wx:if="{{!hasUserInfo}}">
+        <view class="weui-loadmore__tips weui-loadmore__tips_in-line">请登录</view>
+      </view>
+      <view class="weui-loadmore weui-loadmore_line" wx:if="{{hasHomeData}}">
+        <view class="weui-loadmore__tips weui-loadmore__tips_in-line">没有数据</view>
+      </view>
+    </view>
 
-      <block wx:for="{{[1, 2, 3,4,5,6,7,8,9]}}">
+
+    <view class="goods-body" wx:else>
+
+      <block wx:for="{{products}}" >
         <view class="goods-row">
           <view class="goods-row-image">
-            <image src="../common/image/cloth{{item%2}}.png"></image>
+            <image src="{{item.thumbnail}}" wx:if="{{item.thumbnail}}"></image>
+            <image src="../common/image/cloth0.png" wx:else></image>
           </view>
 
           <view class="goods-row-content">
             <view class="goods-row-text">
-              <view class="goods-row-text1"> 6199</view>
+              <view class="goods-row-text1">{{item.product_code}}</view>
               <view class="goods-row-operate">
-                <button class="goods-mini-btn1" type="default" size="mini" data-code="6199"  data-id="0" bindtap="stockin">入</button>
-                <button class="goods-mini-btn2" type="default" size="mini" data-code="6199"  data-id="0" bindtap="stockout">出</button>
+                <button class="goods-mini-btn1" type="default" size="mini" data-code="{{item.product_code}}"  data-id="{{item.product_id}}" bindtap="stockin">入</button>
+                <button class="goods-mini-btn2" type="default" size="mini" data-code="{{item.product_code}}"  data-id="{{item.product_id}}" bindtap="stockout">出</button>
               </view>
             </view>
-            <text class="goods-row-text2" wx:if="{{item%2 == 0}}" >柳丁牛仔外套长袖女宽松上衣复古新春秋韩版百搭</text>
-            <text class="goods-row-text2" wx:if="{{item%2 == 1}}" >长袖女宽松上衣</text>
+            <text class="goods-row-text2">{{item.product_name}}</text>
           </view>
 
           
         </view>
       </block>
-      <view class="weui-loadmore weui-loadmore_line">
-        <view class="weui-loadmore__tips weui-loadmore__tips_in-line">没有啦</view>
-      </view>
+      
     </view>
-
+    
   </block>
 
 </view>

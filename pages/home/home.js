@@ -13,6 +13,10 @@ Page({
     data: {
         inputWidth: '150rpx',
         userInfo: {},
+        storeInfo:{},
+        stocks:[],
+        products:[],
+        hasHomeData:false,
         hasUserInfo: false,
         code:'',   //款号
         nullHouse:true,
@@ -23,25 +27,27 @@ Page({
      * 生命周期函数--监听页面加载
      */
     onLoad: function(options) {
-        console.log("+++ home.begin +++");
+        util.mylog("+++ home.begin +++");
+
+        var topThis = this;
 
         var wait = wx.getStorageSync('wait');
         this.setData({
             wait: wait
         })
 
-        console.log("home.wait...:" + wait);
+        util.mylog("home.wait...:" + wait);
         if(wait === true){  //先等待首次打开应用时的授权响应
 
-            console.log("+++ load.begin +++");
+            util.mylog("+++ load.begin +++");
             //zjh 等待授权反馈
             (function load() {
                 wx.getStorage({
                     key: 'wait',
                     success: function(res) {
-                        console.log('load.wait...:' + res.data);
+                        util.mylog('load.wait...:' + res.data);
                         if (res.data === false) {
-                            console.log("load.redirect");
+                            util.mylog("load.redirect");
                             // zjh 没有登录过，则跳转到初始引导和介绍的页面
                             if (!app.globalData.hasLogin) {
                                 wx.reLaunch({
@@ -61,13 +67,16 @@ Page({
 
         }else{
 
-            console.log("+++ real home.begin +++");
+            util.mylog("+++ real home.begin +++");
 
             if (app.globalData.userInfo) {
                 this.setData({
                     userInfo: app.globalData.userInfo,
                     hasUserInfo: true
                 })
+
+                // 获取首页数据
+                topThis.getHomeData();
             }else{
                 wx.getSetting({   //zjh 获取设置信息
                     success: res => {
@@ -87,27 +96,39 @@ Page({
                                             userInfo: result,
                                             hasUserInfo: true
                                         })
+                                        util.mylog('session');
+                                        // 获取首页数据
+                                        topThis.getHomeData();
+
                                     } else {
                                         // 如果不是首次登录，不会返回用户信息，请求用户信息接口获取
                                         qcloud.request({
                                             url: config.service.usersUrl,
                                             login: true,
                                             success(result) {
-                                                console.log('result:');
-                                                console.log(result);
+                                                util.mylog('result:');
+                                                util.mylog(result);
                                                 util.showSuccess('登录成功')
                                                 app.globalData.userInfo = result.data.data
                                                 that.setData({
                                                     userInfo: result.data.data,
                                                     hasUserInfo: true
                                                 })
+
+                                                util.mylog('info');
+                                                // 获取首页数据
+                                                topThis.getHomeData();
                                             },
 
                                             fail(error) {
 
-                                                util.showModel('请求失败', error)
+                                                if(config.debug){
+                                                    util.showDebugModel('请求失败', error)
+                                                }else{
+                                                    util.showFail('登录失败')
+                                                }
 
-                                                console.log('request fail', error)
+                                                util.mylog('request fail', error)
                                             }
                                         })
                                     }
@@ -119,7 +140,7 @@ Page({
                                     }else{
                                         util.showFail('登录失败')
                                     }
-                                    console.log('登录失败', error)
+                                    util.mylog('登录失败', error)
                                 }
                             })
                         }
@@ -131,7 +152,7 @@ Page({
 
     },
     getUserInfo: function(e) {
-        console.log(e)
+        util.mylog(e)
 
         util.showBusy('正在登录')
         var that = this
@@ -147,6 +168,10 @@ Page({
                         userInfo: result,
                         hasUserInfo: true
                     })
+
+                    // 获取首页数据
+                    that.getHomeData();
+
                 } else {
                     // 如果不是首次登录，不会返回用户信息，请求用户信息接口获取
                     qcloud.request({
@@ -159,6 +184,9 @@ Page({
                                 userInfo: result.data.data,
                                 hasUserInfo: true
                             })
+
+                            // 获取首页数据
+                            that.getHomeData();
                         },
 
                         fail(error) {
@@ -168,7 +196,7 @@ Page({
                                 util.showModel('请求失败', '请求失败，请检查网络状态')
                             }
                             
-                            console.log('request fail', error)
+                            util.mylog('request fail', error)
                         }
                     })
                 }
@@ -181,13 +209,20 @@ Page({
                     util.showModel('登录失败', '请检查网络状态和是否已授权')
                 }
                 
-                console.log('登录失败', error)
+                util.mylog('登录失败', error)
             }
         })
     },
 
+    inputFocus:function(e){
+        util.mylog(e)
+        wx.navigateTo({
+          url: '../findstock/findstock'
+        })
+    },
+
     checkDetail:function(e){
-        console.log(e);
+        util.mylog(e);
 
         var code = e.currentTarget.dataset.code;
         var id = e.currentTarget.dataset.id;
@@ -200,7 +235,7 @@ Page({
 
     stockin:function(e){
 
-        console.log(e);
+        util.mylog(e);
         var code = e.currentTarget.dataset.code;
         var id = e.currentTarget.dataset.id;
         if(code.length <= 0){
@@ -222,7 +257,7 @@ Page({
 
     stockout:function(e){
 
-        console.log(e);
+        util.mylog(e);
 
         var code = e.currentTarget.dataset.code;
         var id = e.currentTarget.dataset.id;
@@ -253,7 +288,7 @@ Page({
      * 检测输入
      */
     detectInput: function(e) {
-        console.log(e);
+        util.mylog(e);
         var input = e.detail.value;
 
         if (e.detail.cursor > 0) {
@@ -292,11 +327,6 @@ Page({
         }, 1500)
     },
 
-    inputFocus: function() {
-        this.setData({
-            inputWidth: '250rpx',
-        });
-    },
     inputBlur: function() {
         this.setData({
             inputWidth: '150rpx',
@@ -304,7 +334,7 @@ Page({
     },
 
     speak:function(e){
-        console.log(e);
+        util.mylog(e);
         if(e.recordermanager){
 
         
@@ -312,21 +342,21 @@ Page({
         // const recorderManager = wx.getRecorderManager()
 
         recorderManager.onStart(() => {
-          console.log('recorder start')
+          util.mylog('recorder start')
         })
         recorderManager.onResume(() => {
-          console.log('recorder resume')
+          util.mylog('recorder resume')
         })
         recorderManager.onPause(() => {
-          console.log('recorder pause')
+          util.mylog('recorder pause')
         })
         recorderManager.onStop((res) => {
-          console.log('recorder stop', res)
+          util.mylog('recorder stop', res)
           const { tempFilePath } = res
         })
         recorderManager.onFrameRecorded((res) => {
           const { frameBuffer } = res
-          console.log('frameBuffer.byteLength', frameBuffer.byteLength)
+          util.mylog('frameBuffer.byteLength', frameBuffer.byteLength)
         })
 
         const options = {
@@ -342,6 +372,59 @@ Page({
         }
     },
 
+    speakManage:function(){
+        util.showModel('','即将开放，敬请期待');
+        // this.myToast('即将开放，敬请期待')
+    },
+
+    getHomeData:function(){
+        //显示加载动画
+        wx.showNavigationBarLoading();
+
+        var that = this;
+
+        qcloud.request({
+            url: config.service.generalUrl+'/home',
+            login: true,
+            method:'GET',
+            success(result) {
+                util.mylog('home Data : ',result);
+                var res = result.data;
+                //隐藏加载动画
+                wx.hideNavigationBarLoading()
+                //停止刷新
+                wx.stopPullDownRefresh()
+                app.globalData.storeInfo = res.data.store
+
+                util.mylog('set Store : ',app.globalData.storeInfo);
+
+                that.data.products = that.data.products.concat(res.data.products);
+                util.mylog('stocks',res.data.stocks);
+                util.mylog('products',that.data.products);
+                that.setData({
+                    hasHomeData:true,
+                    storeInfo: res.data.store?res.data.store:{},
+                    stocks: res.data.stocks?res.data.stocks:[],
+                    products:that.data.products?that.data.products:[],
+                })
+
+                //关闭自动刷新
+                app.globalData.refresh.home = 0;
+            },
+
+            fail(error) {
+                util.showDebugModel('请求失败', error)
+                //隐藏加载动画
+                wx.hideNavigationBarLoading()
+                //停止刷新
+                wx.stopPullDownRefresh()
+                that.setData({
+                    hasHomeData:true
+                })
+            }
+        })
+    },
+
     /**
      * 生命周期函数--监听页面初次渲染完成
      */
@@ -349,11 +432,19 @@ Page({
     /**
      * 生命周期函数--监听页面显示
      */
-    onShow: function() {},
+    onShow: function() {
+        if(app.globalData.refresh.home == 1){
+            this.data.products = [];
+            this.getHomeData();
+        }
+    },
     /**
      * 生命周期函数--监听页面隐藏
      */
-    onHide: function() {},
+    onHide: function() {
+        //隐藏加载动画
+        wx.hideNavigationBarLoading()
+    },
     /**
      * 生命周期函数--监听页面卸载
      */
@@ -361,7 +452,11 @@ Page({
     /**
      * 页面相关事件处理函数--监听用户下拉动作
      */
-    onPullDownRefresh: function() {},
+    onPullDownRefresh: function() {
+        // 获取商品
+        this.data.products = [];
+        this.getHomeData();
+    },
     /**
      * 页面上拉触底事件的处理函数
      */

@@ -12,8 +12,13 @@ Page({
     data: {
         inputWidth: '150rpx',
         userInfo: {},
+        storeInfo:{},
+        stocks:[],
+        content:'',
+        searchValue:'',
         hasUserInfo: false,
         hasResult: false,
+        result:{},
         nullHouse:true,
         toast:'',
         canIUse: wx.canIUse('button.open-type.getUserInfo')
@@ -25,6 +30,7 @@ Page({
         if (app.globalData.userInfo) {
             this.setData({
                 userInfo: app.globalData.userInfo,
+                storeInfo:app.globalData.storeInfo,
                 hasUserInfo: true
             })
         } else if (this.data.canIUse) {
@@ -48,14 +54,19 @@ Page({
                 }
             })
         }
+
     },
     getUserInfo: function(e) {
-        console.log(e)
+        util.mylog(e)
         app.globalData.userInfo = e.detail.userInfo
         this.setData({
             userInfo: e.detail.userInfo,
             hasUserInfo: true
         })
+
+        // 获取商品
+        this.data.stocks = [];
+        this.getProducts();
     },
     inputFocus: function() {
         this.setData({
@@ -71,7 +82,7 @@ Page({
      * 检测输入
      */
     detectInput: function(e) {
-        console.log(e);
+        util.mylog(e);
         var input = e.detail.value;
         if (e.detail.cursor > 0) {
             //检测输入的是否为数字
@@ -102,7 +113,7 @@ Page({
         }, 1500)
     },
     inputConfirm: function(e) {
-        console.log(e);
+        util.mylog(e);
         var value = e.detail.value;
 
         if(value.length <= 0){
@@ -118,16 +129,105 @@ Page({
         }
 
         //网络查询到数据后
-        if(value == 6190){
-            this.setData({
-                hasResult:true
-            })
-        }else{
-            util.showFail('找不到对应款号');
-            return;
-        }
+        this.searchProduct(value);
         
     },
+
+    /**
+     * 获取商品
+     * @return  {[type]}  [description]
+     */
+    getProducts:function(){
+        //显示加载动画
+        wx.showNavigationBarLoading();
+
+        var that = this;
+        that.setData({
+            hasResult:false,
+            content:'',
+            searchValue:''
+        })
+        qcloud.request({
+            url: config.service.generalUrl+'/stores/mine',
+            login: true,
+            method:'GET',
+            success(result) {
+                util.mylog('result Data : ',result);
+                var res = result.data;
+                //隐藏加载动画
+                wx.hideNavigationBarLoading()
+                //停止刷新
+                wx.stopPullDownRefresh()
+
+                if(!app.globalData.storeInfo ){
+                    app.globalData.storeInfo = res.data.store
+                    util.mylog('set Store : ',app.globalData.storeInfo);
+                }
+                if(!that.data.stocks){
+                    that.data.stocks = [];
+                }
+                that.data.stocks = res.data.stocks;
+                util.mylog('stocks:',that.data.stocks);
+                that.setData({
+                    storeInfo: res.data.store?res.data.store:null,
+                    stocks:that.data.stocks?that.data.stocks:[],
+                    content:'没有商品'
+                })
+
+                //关闭自动刷新
+                app.globalData.refresh.store = 0;
+            },
+
+            fail(error) {
+
+                //隐藏加载动画
+                wx.hideNavigationBarLoading()
+                //停止刷新
+                wx.stopPullDownRefresh()
+                util.showDebugModel('请求失败', error)
+                that.setData({
+                    content:'请求失败'
+                })
+            }
+        })
+    },
+
+    /**
+     * 查询货号
+     * @param   {[type]}  code  [description]
+     * @return  {[type]}        [description]
+     */
+    searchProduct:function(code){
+        //显示加载动画
+        wx.showNavigationBarLoading();
+
+        var that = this;
+
+        qcloud.request({
+            url: config.service.generalUrl+'/search?product_code='+code,
+            login: true,
+            method:'GET',
+            success(result) {
+                util.mylog('result Data : ',result);
+                var res = result.data;
+                //隐藏加载动画
+                wx.hideNavigationBarLoading()
+                util.showSuccess('查找成功')
+                that.setData({
+                    hasResult:true,
+                    result:res.data
+                })
+            },
+
+            fail(error) {
+
+                //隐藏加载动画
+                wx.hideNavigationBarLoading()
+                util.showDebugModel('查找失败', error)
+            }
+        })
+    },
+
     /**
      * 生命周期函数--监听页面初次渲染完成
      */
@@ -135,7 +235,23 @@ Page({
     /**
      * 生命周期函数--监听页面显示
      */
-    onShow: function() {},
+    onShow: function() {
+        if(!this.data.stocks || this.data.stocks.length == 0){
+            // 获取商品
+            this.getProducts();
+        }else{
+            this.setData({
+                hasResult:false,
+                content:'',
+                searchValue:''
+            })
+
+            //出入库后自动刷新
+            if(app.globalData.refresh.store == 1){
+                this.getProducts();
+            }
+        }
+    },
     /**
      * 生命周期函数--监听页面隐藏
      */
@@ -147,7 +263,11 @@ Page({
     /**
      * 页面相关事件处理函数--监听用户下拉动作
      */
-    onPullDownRefresh: function() {},
+    onPullDownRefresh: function() {
+        // 获取商品
+        this.data.stocks = [];
+        this.getProducts();
+    },
     /**
      * 页面上拉触底事件的处理函数
      */

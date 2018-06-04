@@ -15,3 +15,9 @@
     
     <button type="primary" bindtap="showDialog"> ClickMe! </button>
 </view>　
+
+<loading></loading>
+
+<nodata></nodata>
+
+<cover bind:showCover="showCover" id="cover"></cover>

@@ -52,7 +52,7 @@ Page({
      * 生命周期函数--监听页面加载
      */
     onLoad: function(options) {
-        console.log(options)
+        util.mylog(options)
         this.setData({
             code: options.code
         })
@@ -64,48 +64,105 @@ Page({
                 content:[
                     {
                         image:'in.png',
-                        content:result.color+' , '+result.size+' , '+result.number+' 件'
+                        content:result.color+' , '+result.size+' , '+result.stock_amount+' 件'
                     }
                 ]
             }
         })
-        this.dialog.showDialog();
+        this.dialog.showDialog(result);
     },
+
+    showNoAction(title,content) {
+        this.setData({
+            dialog:{
+                title:title,
+                content:[
+                    {
+                        image:'close.png',
+                        content:content
+                    }
+                ]
+            }
+        })
+        this.errDialog.showDialog();
+    },
+
+    //无行动事件
+    _noEvent(e) {
+        util.mylog(e);
+        util.mylog('no action');
+        this.errDialog.hideDialog();
+    },
+
     //取消事件
     _cancelEvent(e) {
-        console.log(e);
-        console.log('你点击了取消');
+        util.mylog(e);
+        util.mylog('你点击了取消');
         this.dialog.hideDialog();
     },
     //确认事件
     _confirmEvent(e) {
-        console.log(e);
-        console.log('你点击了确定');
+        util.mylog(e);
+        util.mylog('你点击了确定');
         this.dialog.hideDialog();
 
         //确认后与后台通讯
-        //后台返回后跳转(用重定向的方式)
-        var url = '../stockin/stockin?code='+this.data.code;
-        url = encodeURIComponent(url);  //编码，防止重复?，丢失参数的问题
-        console.log('url before redirect :'+url);
-        wx.redirectTo({
-          url: '../msg/msg_success?operate=入库&url='+url
-        })
-
-        //失败
-        // wx.redirectTo({
-        //   url: '../msg/msg_fail?operate=入库&url='+url
-        // })
+        this.postStock(e.detail);
             
                 
     },
+
+    /**
+     * 联网推送数据
+     * @param   {[type]}  data  [description]
+     * @return  {[type]}        [description]
+     */
+    postStock:function(data){
+        //显示加载动画
+        util.showBusy('入库中');
+
+        var that = this;
+        var url = '../stockin/stockin?code='+this.data.code;
+        url = encodeURIComponent(url);  //编码，防止重复?，丢失参数的问题
+        util.mylog('url before redirect :'+url);
+
+        qcloud.request({
+            url: config.service.generalUrl+'/stocks',
+            login: true,
+            method:'POST',
+            data:data,
+            success(result) {
+                util.mylog('result Data : ',result);
+                var res = result.data;
+                //隐藏加载动画
+                wx.hideToast();
+
+                //后台返回后跳转(用重定向的方式)
+                wx.redirectTo({
+                  url: '../msg/msg_success?operate=入库&url='+url
+                })
+            },
+
+            fail(error) {
+
+                //隐藏加载动画
+                wx.hideToast();
+
+                wx.redirectTo({
+                    url: '../msg/msg_fail?operate=入库&url='+url
+                })
+
+            }
+        })
+    },
+
     /**
      * 提交表单
      * @param   {[type]}  e  [description]
      * @return  {[type]}     [description]
      */
     formSubmit: function(e) {
-        console.log(e);
+        util.mylog(e);
         var result = e.detail.value; //获取表单结果
         if (!e.detail.value.color_switch) { //颜色自定义开关是关闭的
             result.color = this.data.colorArray[result.color];
@@ -124,7 +181,14 @@ Page({
             util.showFail('请输入尺码');
             return;
         }
-        console.log('result:', result);
+        util.mylog('result:', result);
+
+        // 拍照功能正在开发中
+        if(e.detail.target.id === "photo_confirm"){
+
+            this.showNoAction("开发中...","拍照功能正在开发中...")
+            return;
+        }
 
         //弹出确认框
         this.showDialog(result);
@@ -135,7 +199,7 @@ Page({
      * @return  {[type]}     [description]
      */
     pickerColorChange: function(e) {
-        console.log('color picker发送选择改变，携带值为', e.detail.value)
+        util.mylog('color picker发送选择改变，携带值为', e.detail.value)
         this.setData({
             colorIndex: e.detail.value
         })
@@ -146,7 +210,7 @@ Page({
      * @return  {[type]}     [description]
      */
     pickerSizeChange: function(e) {
-        console.log('size picker发送选择改变，携带值为', e.detail.value)
+        util.mylog('size picker发送选择改变，携带值为', e.detail.value)
         this.setData({
             sizeIndex: e.detail.value
         })
@@ -157,7 +221,7 @@ Page({
      * @return  {[type]}     [description]
      */
     inputChange: function(e) {
-        console.log(e);
+        util.mylog(e);
         if (e.detail.value > initMax) { //已经达到了滑块的最大值
             this.setData({
                 sliderValue: e.detail.value,
@@ -184,7 +248,7 @@ Page({
      * @return  {[type]}     [description]
      */
     colorCustom: function(e) {
-        console.log(e);
+        util.mylog(e);
         if (e.detail.value) {
             this.setData({
                 color: {
@@ -219,7 +283,7 @@ Page({
      * @return  {[type]}     [description]
      */
     sizeCustom: function(e) {
-        console.log(e);
+        util.mylog(e);
         if (e.detail.value) {
             this.setData({
                 size: {
@@ -258,16 +322,16 @@ Page({
             number: e.detail.value,
             sliderValue: e.detail.value
         })
-        console.log(e);
+        util.mylog(e);
     },
     /**
      * 增加 
      * @param  {[type]}  e  [description]
      */
     addCount: function(e) {
-        console.log('addCount : ' + this.data.sliderValue);
+        util.mylog('addCount : ' + this.data.sliderValue);
         if (this.data.sliderValue >= this.data.sliderMax) { //已经达到了滑块的最大值
-            console.log('addCount sliderMax: ' + this.data.sliderMax);
+            util.mylog('addCount sliderMax: ' + this.data.sliderMax);
             this.setData({
                 number: parseInt(this.data.sliderValue) + 1,
                 sliderValue: parseInt(this.data.sliderValue) + 1,
@@ -286,7 +350,7 @@ Page({
      * @return  {[type]}     [description]
      */
     minusCount: function(e) {
-        console.log('minusCount : ' + this.data.sliderValue);
+        util.mylog('minusCount : ' + this.data.sliderValue);
         var after = parseInt(this.data.sliderValue) - 1;
         after = after >= 1 ? after : 1;
         this.setData({
@@ -300,6 +364,8 @@ Page({
     onReady: function() {
         //获得dialog组件 zjh
         this.dialog = this.selectComponent("#dialog");
+
+        this.errDialog = this.selectComponent("#err_dialog");
     },
     /**
      * 生命周期函数--监听页面显示

@@ -14,7 +14,8 @@ Page({
         stockId:0,
         number:1,
         buttonColor:'',
-        items: {},
+        items: [],
+        hasGot:false,
         dialog:{     //zjh 例子
             title:'xxx 入库',     
             content:[
@@ -30,69 +31,22 @@ Page({
      */
     onLoad: function(options) {
 
-        console.log(options)
+        util.mylog(options)
         this.setData({
             code: options.code
         })
 
         //获取货号对应的id
         this.data.stockId = options.stock_id;
-        
-        // util.showBusy('')
 
         var that = this;
 
-        this.tempset();  //临时设置，对接接口后，清除
-
-        // qcloud.request({
-        //     url: config.service.generalUrl+"/stock/stocks/"+this.data.stockId,
-        //     login: true,
-        //     success(result) {
-        //         util.showSuccess('')
-        //         that.setData({
-        //             code: options.code,
-        //             items:result.data.data.skus
-        //         })
-        //     },
-        //     fail(error) {
-        //         if (config.debug) {
-        //             util.showDebugModel('请求失败', error)
-        //         } else {
-        //             util.showModel('请求失败', '请求失败，请检查网络状态')
-        //         }
-        //         console.log('request fail', error)
-        //     }
-        // })
-    },
+        //网络查询
+        that.searchProduct(this.data.code);
+    },  
 
     // 对接后删除
-    tempset:function(e){
-
-    var items = 
-        [
-            {
-                id:1,
-                stock_id:2,
-                color:'红色',
-                size:'XL',
-                stock_amount:12,
-            },
-            {
-                id:2,
-                stock_id:2,
-                color:'黑色',
-                size:'XL',
-                stock_amount:12,
-            },
-            {
-                id:4,
-                stock_id:2,
-                color:'白色',
-                size:'XL',
-                stock_amount:12,
-            },
-
-        ];
+    setResult:function(items){
 
         for(var key in items){
             items[key]['number'] = 1;
@@ -101,13 +55,13 @@ Page({
             items[key]['check'] = false;
         }
 
-        console.log('items : ',items)
+        util.mylog('items : ',items)
 
         this.setData({
-            items:items
+            items:items,
+            hasGot:true
         })
     },
-
 
 
 
@@ -118,10 +72,10 @@ Page({
         for(var key in items){
             // result.hasOwnProperty(items[key].id)
             // result[items[key].id] !== undefined
-            if(result.hasOwnProperty(items[key].id)){
+            if(result.hasOwnProperty(items[key].sku_id)){
                 content.push({
                     image:'out.png',
-                    content:items[key].color+' , '+items[key].size+' , '+result[items[key].id]+' 件'
+                    content:items[key].color+' , '+items[key].size+' , '+result[items[key].sku_id]+' 件'
                 });
             }
         }
@@ -136,14 +90,14 @@ Page({
     },
     //取消事件
     _cancelEvent(e) {
-        console.log(e);
-        console.log('你点击了取消');
+        util.mylog(e);
+        util.mylog('你点击了取消');
         this.dialog.hideDialog();
     },
     //确认事件
     _confirmEvent(e) {
-        console.log(e);
-        console.log('你点击了确定');
+        util.mylog(e);
+        util.mylog('你点击了确定');
         this.dialog.hideDialog();
 
 
@@ -164,7 +118,38 @@ Page({
     },
 
 
+    /**
+     * 查询货号
+     * @param   {[type]}  code  [description]
+     * @return  {[type]}        [description]
+     */
+    searchProduct:function(code){
+        //显示加载动画
+        wx.showNavigationBarLoading();
 
+        var that = this;
+
+        qcloud.request({
+            url: config.service.generalUrl+'/search?product_code='+code,
+            login: true,
+            method:'GET',
+            success(result) {
+                util.mylog('result Data : ',result);
+                var res = result.data;
+                //隐藏加载动画
+                wx.hideNavigationBarLoading()
+                
+                that.setResult(res.data.stock.skus)
+            },
+
+            fail(error) {
+
+                //隐藏加载动画
+                wx.hideNavigationBarLoading()
+                util.showDebugModel('请求失败', error)
+            }
+        })
+    },
 
 
     /**
@@ -173,7 +158,7 @@ Page({
      * @return  {[type]}     [description]
      */
     inputChange:function(e){
-        console.log(e);
+        util.mylog(e);
 
         for(var key in this.data.items){
 
@@ -220,8 +205,8 @@ Page({
      * @return  {[type]}     [description]
      */
     checkboxChange: function(e) {
-        console.log(e)
-        console.log('checkbox发生change事件，携带value值为：', e.detail.value)
+        util.mylog(e)
+        util.mylog('checkbox发生change事件，携带value值为：', e.detail.value)
     },
 
     /**
@@ -230,11 +215,11 @@ Page({
      * @return  {[type]}     [description]
      */
     bindcheck:function(e){
-        console.log('click : ',e)
+        util.mylog('click : ',e)
 
         var check = false;
         for(var key in this.data.items){
-            if(this.data.items[key]['id'] == e.target.id){
+            if(this.data.items[key]['sku_id'] == e.target.id){
                 if(e.target.dataset.check){
                     this.data.items[key]['color_style'] = "" 
                     this.data.items[key]['check'] = false;
@@ -266,7 +251,7 @@ Page({
     },
 
     clickCheck:function(e){
-        console.log('clickCheck',e);
+        util.mylog('clickCheck',e);
     },
     /**
      * 提交表单
@@ -274,7 +259,7 @@ Page({
      * @return  {[type]}     [description]
      */
     formSubmit: function(e) {
-        console.log(e);
+        util.mylog(e);
 
         var check = false;
         for(var key in this.data.items){
@@ -300,7 +285,7 @@ Page({
             result[checkArray[i]] = temp[sku];
         }
 
-        console.log('result:',result);
+        util.mylog('result:',result);
 
         //zjh 弹出确认窗口
         this.showDialog(result);
@@ -312,11 +297,11 @@ Page({
      */
     addCount: function(e) {
 
-        console.log(e)
+        util.mylog(e)
 
         for(var key in this.data.items){
-            console.log(this.data.items)
-            if(this.data.items[key]['id'] == e.target.dataset.num){
+            util.mylog(this.data.items)
+            if(this.data.items[key]['sku_id'] == e.target.dataset.num){
 
                 if(!this.data.items[key]['check']){
                     //提示已经达到最大值
@@ -347,11 +332,11 @@ Page({
      */
     minusCount: function(e) {
 
-        console.log(e)
-        console.log(e.target.dataset.num)
+        util.mylog(e)
+        util.mylog(e.target.dataset.num)
         for(var key in this.data.items){
-            console.log(this.data.items)
-            if(this.data.items[key]['id'] == e.target.dataset.num){
+            util.mylog(this.data.items)
+            if(this.data.items[key]['sku_id'] == e.target.dataset.num){
 
                 if(!this.data.items[key]['check']){
                     //提示已经达到最大值

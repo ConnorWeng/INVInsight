@@ -41,7 +41,7 @@ function request(options) {
         throw new RequestError(constants.ERR_INVALID_PARAMS, message);
     }
 
-    console.log('request begin');
+    utils.log.mylog('request begin');
 
     var requireLogin = options.login;
     var success = options.success || noop;
@@ -87,24 +87,24 @@ function request(options) {
         var time = Date.parse(new Date())/1000;
         var timestamp = {timestamp:time};
         var signParams = utils.extend({}, options.data, timestamp);
-        console.log("request signParams :");
-        console.log(signParams);
+        utils.log.mylog("request signParams :");
+        utils.log.mylog(signParams);
         var signature = Signature.signature(signParams);
-        console.log("request outer mdsignture :"+signature);
+        utils.log.mylog("request outer mdsignture :"+signature);
         //zjh 加入头部
         authHeader['timestamp'] = time;
         authHeader['signature'] = signature;
 
-        console.log('real request begin');
-        console.log('request url : '+options.url);
+        utils.log.mylog('real request begin');
+        utils.log.mylog('request url : '+options.url);
 
         wx.request(utils.extend({}, options, {
             header: utils.extend({}, originHeader, authHeader),
 
             success: function (response) {
                 var data = response.data;
-                console.log('request return :');
-                console.log(response);
+                utils.log.mylog('request return :');
+                utils.log.mylog(response);
                 var error, message;
                 if (data && data.code === 451) {  //zjh 451代表登录态已经过期
                     Session.clear();
@@ -146,13 +146,13 @@ function request(options) {
                     return;
 
                 }else if(data && data.code === 0) {   //zjh 返回正确
-                    console.log('return arguments :');
-                    console.log(arguments);  
+                    utils.log.mylog('return arguments :');
+                    utils.log.mylog(arguments);  
                     callSuccess.apply(null, arguments);
 
                 }else if(data && data.code === 999){  // 返回业务问题
-                    console.log('business issue :')
-                    console.log(data);
+                    utils.log.mylog('business issue :')
+                    utils.log.mylog(data);
                     message = data.issue.msg;
 
                     if(requestDebug){
@@ -164,8 +164,8 @@ function request(options) {
                     callFail(error);
                 }else{                            // 其他系统和接口层面的问题
 
-                    console.log('api fail :')
-                    console.log(data);
+                    utils.log.mylog('api fail :')
+                    utils.log.mylog(data);
 
                     if(data.message){
                         message = data.message;

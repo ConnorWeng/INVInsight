@@ -280,10 +280,10 @@ page{
     background-color: white;
 }
 .mini-btn1 {
-    margin-top: 11rpx;
+    margin-top: 15rpx;
 }
 .mini-btn2 {
-    margin-top:4rpx;
+    margin-top:-4rpx;
 }
 .detail {
     margin-left: 9rpx;

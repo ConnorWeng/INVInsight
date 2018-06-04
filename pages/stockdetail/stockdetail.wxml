@@ -8,19 +8,22 @@
 	<!--库存信息概览-->
 	<view class="overview ">
 		<view class="code">款号：{{code}}</view>
-		<view class="stockin-number">入库：12 </view>
-		<view class="total">库存：45</view>
-		<view class="stockout-number">出库：2</view>
+		<view class="stockin-number">入库：{{result.summary.in}} </view>
+		<view class="total">库存：{{result.stock.stock_amount}}</view>
+		<view class="stockout-number">出库：{{result.summary.out}}</view>
 	</view>
 
 	<!--详情-->
 	<view class="detail">
 		<view class="detail-title">详情</view>
-		<view class="detail-content">
-			<block wx:for="{{[1, 2, 3,4,5,6,7,8,9,10,11,12,13,14]}}">
+		<view class="detail-content" wx:if="{{!result.stock.skus || result.stock.skus.length == 0}}">
+			<nodata content=""></nodata>
+		</view>
+		<view class="detail-content" wx:else>
+			<block wx:for="{{result.stock.skus}}">
 				<view class="detail-item">
-					<view class="item-content">红色 , S</view>
-					<view class="item-number">库存量：12</view>
+					<view class="item-content">{{item.color}} , {{item.size}}</view>
+					<view class="item-number">库存量：{{item.stock_amount}}</view>
 				</view>
 			</block>
 		</view>

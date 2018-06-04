@@ -2,41 +2,49 @@
 
 <view class="container">
 
-  <!--库存列表-->
+   <!--最新库存列表-->
   <block class="list">
 
     <view class="list-head">
       <text>我的库存</text>
-      <input  style="width:{{inputWidth}}" bindinput="bindKeyInput" placeholder="款号..." bindfocus="inputFocus" bindblur="inputBlur"/>
+
+      <input placeholder="款号..." bindtap="inputFocus" disabled="true"/>
     </view>
 
-    <view class="list-body">
+    <view class="list-body"  wx:if="{{stocks === undefined || stocks.length == 0}}">
+      <loading wx:if="{{!hasStockData}}"></loading>
+      <view class="weui-loadmore weui-loadmore_line" wx:if="{{hasStockData}}">
+        <view class="weui-loadmore__tips weui-loadmore__tips_in-line">没有数据</view>
+      </view>
+    </view>
 
-      <block wx:for="{{[1, 2, 3,4,5,6,7,8,9]}}">
+    <view class="list-body" wx:else>
+
+      <block wx:for="{{stocks}}">
         <view class="list-tab">
           <view class="list-tab-image">
-            <image src="../common/image/cloth{{item%2}}.png"></image>
+            <image src="{{item.thumbnail}}" wx:if="{{item.thumbnail}}"></image>
+            <image src="../common/image/cloth0.png" wx:else></image>
           </view>
 
           <view class="list-tab-content">
-            <text class="list-tab-text1"> 6199</text>
-            <text class="list-tab-text2">库存：999</text>
+            <text class="list-tab-text1">{{item.product.product_code}}</text>
+            <text class="list-tab-text2">库存：{{item.stock_amount}}</text>
           </view>
-
           <view class="list-tab-operate">
-            <button class="mini-btn1" type="default" size="mini" data-code="6199" data-id="1" bindtap="stockin">入</button>
-            <button class="mini-btn2" type="default" size="mini" data-code="6199" data-id="1" bindtap="stockout">出</button>
+            <button class="mini-btn1" type="default" size="mini" bindtap="stockin" data-code="{{item.product.product_code}}"  data-id="{{item.stock_id}}">入</button>
+            <button class="mini-btn2" type="default" size="mini" bindtap="stockout" data-code="{{item.product.product_code}}"  data-id="{{item.stock_id}}">出</button>
           </view>
-          <view class="detail" bindtap="checkDetail" data-code="6199" data-id="1">
+          <view class="detail" data-code="{{item.product.product_code}}"  data-id="{{item.stock_id}}" bindtap="checkDetail">
             <image src="../common/image/detail.png" class="detail-image" />
           </view>
         </view>
       </block>
-      <view class="weui-loadmore weui-loadmore_line">
-				<view class="weui-loadmore__tips weui-loadmore__tips_in-line">到最后啦</view>
-			</view>
+
+
     </view>
 
   </block>
+
 
 </view>

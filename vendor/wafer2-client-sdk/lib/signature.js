@@ -29,10 +29,10 @@ var Signature = {
 
         var signKey = this.get();  // 获取签名密钥
 
-        console.log('inner get signKey :'+signKey);
+        utils.log.mylog('inner get signKey :'+signKey);
 
-        console.log('signature params before sort :');
-        console.log(params);
+        utils.log.mylog('signature params before sort :');
+        utils.log.mylog(params);
 
         var sdic = Object.keys(params).sort();
 
@@ -43,8 +43,8 @@ var Signature = {
 
         params = vdic;
 
-        console.log('signature params after sort :');
-        console.log(params);
+        utils.log.mylog('signature params after sort :');
+        utils.log.mylog(params);
 
         var val = '';
         var tmp = '';
@@ -63,10 +63,10 @@ var Signature = {
 
         var signature = new_str + 'secret=' + signKey; 
 
-        console.log('signature :'+signature);
+        utils.log.mylog('signature :'+signature);
 
         var mdSignature = md5.md5(signature); 
-        console.log('mdSignature :'+mdSignature);
+        utils.log.mylog('mdSignature :'+mdSignature);
 
         return mdSignature;
 

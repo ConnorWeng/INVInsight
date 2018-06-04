@@ -2,9 +2,13 @@
 <view class="container">
   <view class="myToast" hidden="{{nullHouse}}">{{toast}}</view>
   <!--店铺名称-->
-  <view class="title">
-    <text class="title-market">大西豪：</text>
-    <text class="title-store">101 蛮女孩牛仔</text>
+  <view class="title" wx:if="{{storeInfo}}">
+    <text class="title-market">{{storeInfo.market_name}} : </text>
+    <text class="title-store">{{storeInfo.store_name}}</text>
+  </view>
+  <view class="title" wx:else>
+    <text class="title-market">市场 : </text>
+    <text class="title-store">店铺</text>
   </view>
 
   <!--用户头像信息-->
@@ -26,44 +30,50 @@
 
   <view class="list">
     <view class="list-head">
-      <input  style="width:{{inputWidth}}" bindinput="detectInput" placeholder="款号..." bindfocus="inputFocus" bindblur="inputBlur" bindconfirm="inputConfirm"/>
+      <input  style="width:{{inputWidth}}" bindinput="detectInput" placeholder="款号..." bindfocus="inputFocus" bindblur="inputBlur" bindconfirm="inputConfirm" value="{{searchValue}}"/>
     </view>
 
     <view class="list-body" wx:if="{{hasResult}}">
 
         <view class="list-tab" >
           <view class="list-tab-image">
-            <image src="../common/image/cloth1.png"></image>
+            <image src="{{result.stock.product.thumbnail}}" wx:if="{{result.stock.product.thumbnail}}"></image>
+            <image src="../common/image/cloth0.png" wx:else></image>
           </view>
 
           <view class="list-tab-content">
             <view class="list-tab-content1">
-              <text class="list-tab-text1"> 6190</text>
+              <text class="list-tab-text1"> {{result.stock.product.product_code}}</text>
             </view>
             <view class="list-tab-content2">
-              <text class="list-tab-text2"> 入：1200</text>
-              <text class="list-tab-text2"> 出：120000</text>
+              <text class="list-tab-text2"> 入：{{result.summary.in?result.summary.in:0}}</text>
+              <text class="list-tab-text2"> 出：{{result.summary.out?result.summary.out:0}}</text>
             </view>
           </view>
 
         </view>
     </view>
 
+    <view class="list-body" wx:elif="{{stocks.length == 0}}">
+      <nodata content="{{content}}"></nodata>
+    </view>
+
     <view class="list-body" wx:else>
 
-      <block wx:for="{{[1, 2, 3,4,5,6,7,8,9]}}" >
+      <block wx:for="{{stocks}}" >
         <view class="list-tab">
           <view class="list-tab-image">
-            <image src="../common/image/cloth{{item%2}}.png"></image>
+            <image src="{{item.thumbnail}}" wx:if="{{item.thumbnail}}"></image>
+            <image src="../common/image/cloth0.png" wx:else></image>
           </view>
 
           <view class="list-tab-content">
             <view class="list-tab-content1">
-              <text class="list-tab-text1"> 6190</text>
+              <text class="list-tab-text1"> {{item.product_code}}</text>
             </view>
             <view class="list-tab-content2">
-              <text class="list-tab-text2"> 入：1200</text>
-              <text class="list-tab-text2"> 出：120000</text>
+              <text class="list-tab-text2"> 入：{{item.in?item.in:0}}</text>
+              <text class="list-tab-text2"> 出：{{item.out?item.out:0}}</text>
             </view>
           </view>
 
@@ -71,6 +81,7 @@
       </block>
 
     </view>
+
   </view>
 
 

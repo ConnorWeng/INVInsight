@@ -42,14 +42,24 @@ Page({
       _cancelEvent(e){
         console.log(e);
         console.log('你点击了取消');
+        console.log(this.data.dialog.title);
         this.dialog.hideDialog();
       },
       //确认事件
       _confirmEvent(e){
         console.log(e);
         console.log('你点击了确定');
+        console.log(this.dialog.title);
         this.dialog.hideDialog();
       },
+
+    showCover:function(e){
+        //获得cover组件
+        // var cover = this.selectComponent("#cover");
+
+        // cover.showCover();
+        console.log('tapcover');
+    },
         /**
      * 生命周期函数--监听页面初次渲染完成
      */

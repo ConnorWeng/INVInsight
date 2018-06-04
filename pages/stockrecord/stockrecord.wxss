@@ -102,7 +102,7 @@ page, .page, .page-bd{
 	color:white;
 	background-color: #bbb;
 	padding: 5rpx;
-	width: 24%;
+	width: 30%;
 	-webkit-border-radius:20rpx;
 	border-radius:10rpx;
 	opacity:0.8;

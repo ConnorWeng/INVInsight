@@ -9,6 +9,8 @@ const formatTime = date => {
   return [year, month, day].map(formatNumber).join('/') + ' ' + [hour, minute, second].map(formatNumber).join(':')
 }
 
+var config = require('../config')  //zjh 获取配置信息
+
 const formatNumber = n => {
   n = n.toString()
   return n[1] ? n : '0' + n
@@ -19,6 +21,7 @@ const formatNumber = n => {
 var showBusy = text => wx.showToast({
     title: text,
     icon: 'loading',
+    mask:true,
     duration: 10000
 })
 
@@ -72,4 +75,16 @@ var showTip = (title,content,action)=>{
 }
 
 
-module.exports = { formatTime, showBusy, showSuccess, showFail,showModel ,showDebugModel,showTip}
+//自定义打印log
+var mylog = () =>{
+  if(config.debug){
+    var args = arguments;
+    for(var i=0;i<args.length;i++){
+      console.log(args[i]);
+    }
+  }
+  
+}
+
+
+module.exports = { formatTime, showBusy, showSuccess, showFail,showModel ,showDebugModel,showTip,mylog}

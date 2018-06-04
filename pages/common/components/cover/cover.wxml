@@ -1,0 +1,3 @@
+<!--pages/common/components/cover/cover.wxml-->
+
+<view class="bg" hidden="{{!isShow}}"></view> 

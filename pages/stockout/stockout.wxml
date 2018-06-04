@@ -19,21 +19,26 @@
       <input type="text" name="product_code" value="{{code}}" />
     </view>
 
-    <view class="form-section">
+    <view wx:if="{{!items || items.length == 0}}">
+    	<nodata content="商品不存在" wx:if="{{hasGot}}"></nodata>
+		<nodata content="" wx:else></nodata>
+	</view>
+
+    <view class="form-section" wx:else>
     	<checkbox-group bindchange="checkboxChange" name="check">
 		  <block  wx:for="{{items}}">
 		  	<view class="checkbox">
 
 		  		<view class="main-content">
-				  	<checkbox value="{{item.id}}" data-check="{{item.check}}" id="{{item.id}}" color="{{item.checkbox_color}}" bindtap="bindcheck" color="#40bacf"></checkbox>
+				  	<checkbox value="{{item.sku_id}}" data-check="{{item.check}}" id="{{item.sku_id}}" color="{{item.checkbox_color}}" bindtap="bindcheck" color="#40bacf"></checkbox>
 
 				    <text class="sku" style="{{item.color_style}}">{{item.color}},{{item.size}}</text>
 				    <text class="total" style="{{item.color_style}}">(库存量：{{item.stock_amount}})</text>
 				</view>
 			    <view class="number">
-			    	<image src="../common/image/minus.png" class="minus" bindtap="minusCount" data-num="{{item.id}}" id="minus_mage_{{item.id}}"></image>
-			    	<input  type="number" name="sku_{{item.id}}" value="{{item.number}}" style="{{item.color_style}}" bindblur="inputChange" data-id="{{item.id}}"/>
-			    	<image src="../common/image/add.png" class="add" bindtap="addCount" data-num="{{item.id}}" id="add_mage_{{item.id}}"></image>
+			    	<image src="../common/image/minus.png" class="minus" bindtap="minusCount" data-num="{{item.sku_id}}" id="minus_mage_{{item.sku_id}}"></image>
+			    	<input  type="number" name="sku_{{item.sku_id}}" value="{{item.number}}" style="{{item.color_style}}" bindblur="inputChange" data-id="{{item.sku_id}}"/>
+			    	<image src="../common/image/add.png" class="add" bindtap="addCount" data-num="{{item.sku_id}}" id="add_mage_{{item.sku_id}}"></image>
 			    </view>
 			</view>
 		  </block>

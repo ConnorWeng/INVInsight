@@ -41,7 +41,10 @@ Component({
      */
     data: {
         // 弹窗显示控制 
-        isShow: false
+        isShow: false,
+
+        //外部数据
+        outerData:{}
     },
     /**
      * 组件的方法列表
@@ -55,10 +58,12 @@ Component({
             })
         },
         //展示弹框
-        showDialog() {
+        showDialog(data) {
             this.setData({
                 isShow: !this.data.isShow
             })
+
+            this.data.outerData  = data;
         },
         /* * 内部私有方法建议以下划线开头 * triggerEvent 用于触发事件 */
         _cancelEvent(e) {
@@ -69,7 +74,7 @@ Component({
         _confirmEvent(e) { 
             //触发成功回调 
             console.log('inner confirm',e);
-            this.triggerEvent("confirmEvent",e.detail); 
+            this.triggerEvent("confirmEvent",this.data.outerData); 
         }
     }
 })

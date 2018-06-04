@@ -1,6 +1,7 @@
 {
 	"navigationBarTitleText": "出库",
     "usingComponents": {
-    	"dialog": "../common/components/dialog/dialog"
+    	"dialog": "../common/components/dialog/dialog",
+    	"nodata":"../common/components/nodata/nodata"
   	}
 }

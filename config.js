@@ -34,7 +34,7 @@ var config = {
     signKey:'mini_program_api_secret', 
 
     // 是否为调试模式
-    debug:true
+    debug:false
 };
 
 module.exports = config;

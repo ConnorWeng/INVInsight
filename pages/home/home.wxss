@@ -196,7 +196,7 @@
 
 .list-body {
     width: 90%;
-    margin-top: 15rpx;
+    margin-top: 25rpx;
 }
 .list-tab {
     display: flex;
@@ -286,17 +286,17 @@
 }
 
 .more{
-  width: 36px;
-  height:36px;
-  margin:0 auto;
- display:block;
+  text-align:center;
+  font-size:11pt;
+  padding-top:14rpx;
+  color:#999;
 
 }
 
 /*已同步的款式*/
 .goods {}
 .goods-head {
-    margin-top: 0rpx;
+    margin-top: 30rpx;
     width: 90%;
     /* border: 1rpx solid red; */
     vertical-align: middle;

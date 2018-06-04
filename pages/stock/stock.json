@@ -1,3 +1,8 @@
 {
-	"navigationBarTitleText": "我的库存"
+	"navigationBarTitleText": "我的库存",
+	"enablePullDownRefresh":true,
+	"usingComponents": {
+        "loading":"../common/components/loading/loading",
+        "cover":"../common/components/cover/cover"
+  	}
 }

@@ -48,26 +48,33 @@
 		</view>
 
 		<!--done状态下的搜索结果界面-->
-		<view class="search-result" wx:if="{{status == 'done'}}">
+		<view class="search-result" wx:if="{{status == 'done' && !hasSearch}}">
+      		<loading content="正在搜索"></loading>
+    	</view>
 
-			<block wx:for="{{[1, 2, 3,4,5]}}">
+		<view class="search-result" wx:if="{{status == 'done' && hasSearch}}">
+
+        	<nodata content="没有数据" wx:if="{{!result || result.length === 0}}"></nodata>
+
+			<block wx:for="{{result}}">
 				<view class="list-tab">
 
 					<view class="list-tab-image">
-						<image src="../common/image/cloth{{item%2}}.png"></image>
+						<image src="{{item.product.thumbnail}}" wx:if="{{item.product.thumbnail}}"></image>
+           				<image src="../common/image/cloth0.png" wx:else></image>
 					</view>
 
 					<view class="list-tab-content">
-						<text class="list-tab-text1"> 6199</text>
-						<text class="list-tab-text2">库存：999</text>
+						<text class="list-tab-text1"> {{item.product.product_code}}</text>
+						<text class="list-tab-text2">库存：{{item.stock_amount}}</text>
 					</view>
 
 					<view class="list-tab-operate">
-						<button class="mini-btn1" type="default" size="mini" bindtap="stockin" data-code="6199"  data-id="1">入</button>
-						<button class="mini-btn2" type="default" size="mini" bindtap="stockout" data-code="6199"  data-id="1">出</button>
+						<button class="mini-btn1" type="default" size="mini" bindtap="stockin" data-code="{{item.product.product_code}}"  data-id="{{item.stock_id}}">入</button>
+						<button class="mini-btn2" type="default" size="mini" bindtap="stockout" data-code="{{item.product.product_code}}"  data-id="{{item.stock_id}}">出</button>
 					</view>
 
-					<view class="detail" data-code="6199"  data-id="1" bindtap="checkDetail">
+					<view class="detail" data-code="{{item.product.product_code}}"  data-id="{{item.stock_id}}" bindtap="checkDetail">
 						<image src="../common/image/detail.png" class="detail-image" />
 					</view>
 

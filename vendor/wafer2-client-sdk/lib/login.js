@@ -39,12 +39,12 @@ var getWxLoginResult = function getLoginCode(callback) {
                                 userInfo: userinfo.userInfo,
                                 withUserinfo: 'yes',
                             });
-                            console.log('outer userinfo');
+                            utils.log.mylog('outer userinfo');
                         }else{
                             var error = new LoginError(constants.ERR_WX_GET_USER_INFO, '授权后才能登录');
                             error.detail = res;
                             callback(error, null);
-                            console.log('no auth for outer userinfo');
+                            utils.log.mylog('no auth for outer userinfo');
                         }
                     },
 
@@ -52,7 +52,7 @@ var getWxLoginResult = function getLoginCode(callback) {
                         var error = new LoginError(constants.ERR_WX_GET_USER_INFO, '授权后才能登录');
                         error.detail = res;
                         callback(error, null);
-                        console.log('get setting fail');
+                        utils.log.mylog('get setting fail');
                     }
                 })
 
@@ -74,7 +74,7 @@ var getWxLoginResult = function getLoginCode(callback) {
                             //             withUserinfo: 'yes',
                             //         });
 
-                            //         console.log('inner userinfo');
+                            //         utils.log.mylog('inner userinfo');
                             //     },
 
                             //     fail: function (userError) {
@@ -93,7 +93,7 @@ var getWxLoginResult = function getLoginCode(callback) {
                                 userInfo: 'nothing',
                                 withUserinfo: 'no',
                             });
-                            console.log('login with no userinfo');
+                            utils.log.mylog('login with no userinfo');
                         // }
                     },
                     fail: res => {
@@ -104,7 +104,7 @@ var getWxLoginResult = function getLoginCode(callback) {
                             userInfo: 'nothing',
                             withUserinfo: 'no',
                         });
-                        console.log('login with no userinfo');
+                        utils.log.mylog('login with no userinfo');
                     }
 
                 })
@@ -161,8 +161,8 @@ var login = function login(options) {
         userinfo = null;
     }
 
-    console.log('userinfo before doLogin : ');
-    console.log(userinfo);
+    utils.log.mylog('userinfo before doLogin : ');
+    utils.log.mylog(userinfo);
 
     var doLogin = () => getWxLoginResult(function (wxLoginError, wxLoginResult) {
         if (wxLoginError) {
@@ -188,10 +188,10 @@ var login = function login(options) {
         var time = Date.parse(new Date())/1000;
         var timestamp = {timestamp:time};
         var signParams = utils.extend({}, options.data, timestamp);
-        console.log("login signParams :");
-        console.log(signParams);
+        utils.log.mylog("login signParams :");
+        utils.log.mylog(signParams);
         var signature = Signature.signature(signParams);
-        console.log("login outer mdsignture :"+signature);
+        utils.log.mylog("login outer mdsignture :"+signature);
         //zjh 加入头部
         header['timestamp'] = time;
         header['signature'] = signature;

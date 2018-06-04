@@ -1,1 +1,6 @@
-{}
+{
+	"enablePullDownRefresh":true,
+	"usingComponents": {
+        "nodata":"../common/components/nodata/nodata"
+  	}
+}

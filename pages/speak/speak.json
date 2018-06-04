@@ -1,5 +1,8 @@
 {
 	"usingComponents": {
-    	"dialog": "../common/components/dialog/dialog"
+    	"dialog": "../common/components/dialog/dialog",
+        "loading":"../common/components/loading/loading",
+        "nodata":"../common/components/nodata/nodata",
+        "cover":"../common/components/cover/cover"
   }
 }
