@@ -3,6 +3,9 @@
 <view class="container">
 
   <view class="title">入库款号：<text class="code">{{code}}</text></view>
+
+  <view class="inlist">[入库清单 <text>{{itemNum}}</text> 条]</view>
+
   <form bindsubmit="formSubmit" id="stockin" class="stockin-form">
 
     <view class="form-section" style="display:none">
@@ -58,8 +61,14 @@
     </view>
 
     <view class="btn-area">
-      <button formType="submit" id="confirm" class="normal-btn"  hover-class="normal-hover">提交</button>
-      <button formType="submit" id="photo_confirm" class="photo-btn" hover-class="photo-hover">拍照并提交</button>
+      <view class="btn-list-area">
+        <button formType="submit" id="add_list" class="listin-btn"  hover-class="normal-hover">加入清单</button>
+        <button formType="submit" id="check_list" class="list-btn" hover-class="photo-hover">查看清单</button>
+      </view>
+      <view class="btn-in-area">
+        <button formType="submit" id="confirm" class="in-btn"  hover-class="normal-hover">直接入库</button>
+      </view>
+      
     </view>
 
   </form>
@@ -69,17 +78,17 @@
       cancelText='取消' 
       content='{{dialog.content}}'
       confirm='确认'
-      bind:cancelEvent="_cancelEvent"  
+      bind:cancelEvent="_cancelEvent1"  
       bind:confirmEvent="_confirmEvent">
   </dialog>
 
-  <dialog id='err_dialog' 
+  <dialog id='list_dialog' 
       title='{{dialog.title}}'  
       cancelText='取消' 
       content='{{dialog.content}}'
       confirm='确认'
-      bind:cancelEvent="_noEvent"  
-      bind:confirmEvent="_noEvent">
+      bind:cancelEvent="_cancelEvent2"  
+      bind:confirmEvent="_addEvent">
   </dialog>
 
 </view>

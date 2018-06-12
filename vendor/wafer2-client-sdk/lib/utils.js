@@ -18,9 +18,9 @@ exports.log = {
     mylog: function() {
         var debug = false;   //zjh 此处可随时调整是否输出
         if (debug) {
-            var args = arguments;
-            for (var i = 0; i < args.length; i++) {
-                console.log(args[i]);
+            // var args = arguments;
+            for (var i = 0; i < arguments.length; i++) {
+                console.log(arguments[i]);
             }
         }
     }

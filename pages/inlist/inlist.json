@@ -1,0 +1,7 @@
+{
+    "navigationBarTitleText": "入库清单",
+    "usingComponents": {
+    	"dialog": "../common/components/dialog/dialog",
+    	"nodata":"../common/components/nodata/nodata"
+  	}
+}

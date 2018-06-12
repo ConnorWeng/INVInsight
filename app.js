@@ -76,7 +76,8 @@ App({
             store:0,
             stock:0,
             detail:0
-        }
+        },
+        currentProduct:null,
     },
 
     // 引入常用的配置和工具

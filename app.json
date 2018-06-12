@@ -5,16 +5,16 @@
         "pages/msg/msg",
         "pages/msg/msg_success",
         "pages/msg/msg_fail",
-        "pages/stockout/stockout",  
+        "pages/stockout/stockout",
         "pages/speak/speak",
         "pages/findstock/findstock",
         "pages/stockrecord/stockrecord",
-        "pages/stock/stock",      
-        "pages/stockdetail/stockdetail", 
+        "pages/stock/stock",
+        "pages/stockdetail/stockdetail",
         "pages/store/store",
         "pages/report/report",
-        "pages/index/index"
-        
+        "pages/index/index",
+        "pages/inlist/inlist"
     ],
     "window": {
         "backgroundColor": "#F1F1F1",
@@ -52,5 +52,5 @@
             }
         ]
     },
-    "debug":false
+    "debug": false
 }

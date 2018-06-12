@@ -106,7 +106,7 @@ Page({
         var url = '../stockout/stockout?code='+this.data.code;
         url = encodeURIComponent(url);  //编码，防止重复?，丢失参数的问题
         wx.redirectTo({
-          url: '../msg/msg_success?operate=出库&url='+url
+          url: '../msg/msg_success?operate=出库&type=out&url='+url
         })
 
         //失败
@@ -162,7 +162,7 @@ Page({
 
         for(var key in this.data.items){
 
-            if(this.data.items[key]['id'] == e.target.dataset.id){
+            if(this.data.items[key]['sku_id'] == e.target.dataset.id){
 
                 if(!this.data.items[key]['check']){
                     //提示已经达到最大值

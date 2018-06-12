@@ -5,6 +5,8 @@ var qcloud = app.qcloud;
 var util = app.util;
 var config = app.config;
 var initMax = 30; //滑块初始化时候的最大值
+var hasLoad = false;  // 判断是否经历过load
+
 Page({
     /**
      * 页面的初始数据
@@ -46,17 +48,71 @@ Page({
                     content:'红色 , XL , 3 件'
                 },
             ]
-        }
+        },
+        list:{},
+        currentSubList:[],
+        itemNum:0,
     },
     /**
      * 生命周期函数--监听页面加载
      */
     onLoad: function(options) {
         util.mylog(options)
+        
+        //从缓存中获取对应入库清单
+        this.data.list = wx.getStorageSync('inlist');
+        this.data.currentSubList = this.data.list[options.code] === undefined 
+                                    || this.data.list[options.code] === [] 
+                                    ? [] : this.data.list[options.code];
+
+        util.mylog('list',this.data.list);                     
+        util.mylog('currentSubList',this.data.currentSubList);
+
+        //获取款号 和 获取清单条数
         this.setData({
-            code: options.code
+            code: options.code,
+            itemNum:this.data.currentSubList.length            
+        })
+
+        //重置一下currentProduct
+        app.globalData.currentProduct = null;
+
+        hasLoad = true;
+        util.mylog('hasLoad : ',hasLoad);   
+        //网络查询货号
+        this.searchProduct(options.code);
+
+    },
+
+
+    /**
+     * 查询货号
+     * @param   {[type]}  code  [description]
+     * @return  {[type]}        [description]
+     */
+    searchProduct:function(code){
+
+        var that = this;
+
+        qcloud.request({
+            url: config.service.generalUrl+'/search?product_code='+code,
+            login: true,
+            method:'GET',
+            success(result) {
+                util.mylog('result Data : ',result);
+                var res = result.data;
+
+                app.globalData.currentProduct = res.data.stock.skus;
+                util.mylog('currentProduct : ',app.globalData.currentProduct)
+            },
+
+            fail(error) {
+                app.globalData.currentProduct = null;
+            }
         })
     },
+
+
     showDialog(result) {
         this.setData({
             dialog:{
@@ -72,35 +128,45 @@ Page({
         this.dialog.showDialog(result);
     },
 
-    showNoAction(title,content) {
+    showListDialog(result) {
         this.setData({
             dialog:{
-                title:title,
+                title:'清单条目',
                 content:[
                     {
-                        image:'close.png',
-                        content:content
+                        image:'in.png',
+                        content:result.color+' , '+result.size+' , '+result.stock_amount+' 件'
                     }
                 ]
             }
         })
-        this.errDialog.showDialog();
+        this.listDialog.showDialog(result);
     },
 
-    //无行动事件
-    _noEvent(e) {
+    //加入清单事件
+    _addEvent(e) {
         util.mylog(e);
-        util.mylog('no action');
-        this.errDialog.hideDialog();
+        util.mylog('你点击了确定');
+        this.listDialog.hideDialog();
+
+        //加入本地缓存清单
+        this.addToList(e.detail);
     },
 
     //取消事件
-    _cancelEvent(e) {
+    _cancelEvent1(e) {
         util.mylog(e);
         util.mylog('你点击了取消');
         this.dialog.hideDialog();
     },
-    //确认事件
+
+    //取消事件
+    _cancelEvent2(e) {
+        util.mylog(e);
+        util.mylog('你点击了取消');
+        this.listDialog.hideDialog();
+    },
+    //确认直接入库事件
     _confirmEvent(e) {
         util.mylog(e);
         util.mylog('你点击了确定');
@@ -139,7 +205,7 @@ Page({
 
                 //后台返回后跳转(用重定向的方式)
                 wx.redirectTo({
-                  url: '../msg/msg_success?operate=入库&url='+url
+                  url: '../msg/msg_success?operate=入库&type=in&url='+url
                 })
             },
 
@@ -183,16 +249,117 @@ Page({
         }
         util.mylog('result:', result);
 
-        // 拍照功能正在开发中
-        if(e.detail.target.id === "photo_confirm"){
+        // 增加清单
+        if(e.detail.target.id === "add_list"){
+            this.showListDialog(result);
+            return;
+        }
 
-            this.showNoAction("开发中...","拍照功能正在开发中...")
+        // 查看清单
+        if(e.detail.target.id === "check_list"){
+
+            // this.showNoAction("开发中...","拍照功能正在开发中...")
+            // 跳转到清单页面
+            if(this.data.currentSubList.length == 0){
+                util.showFail('清单为空');
+                return;
+            }
+            wx.navigateTo({
+               url: '../inlist/inlist?code='+this.data.code
+            })
             return;
         }
 
         //弹出确认框
         this.showDialog(result);
     },
+
+    /**
+     * 加入本地缓存清单
+     * @param  {[type]}  data  [description]
+     */
+    addToList:function(data){
+        util.mylog("addToList",data);
+
+        var that = this;
+
+        var result = {};
+        result['color'] = data['color'];
+        result['size'] = data['size'];
+        result['number'] = parseInt(data['stock_amount']);
+
+        var existed = -1;
+
+        for(var key in this.data.currentSubList){
+            if(this.data.currentSubList[key]['color'] === data['color']
+                && this.data.currentSubList[key]['size'] === data['size']){
+                existed = key;
+                break;
+            }
+        }
+
+        // 有已存在的sku，则提示是否需要合并
+        if(existed !== -1){
+            wx.showModal({
+                title: '提示',
+                content: '清单中已存在该sku,要累加入库数吗？',
+                success: function(res) {
+                    if (res.confirm) {
+                        console.log('用户点击确定')
+                        that.data.currentSubList[existed]['number'] += parseInt(result['number']);
+                        //将清单写入缓存
+                        that.setStorageList('cumulative');
+                    } else if (res.cancel) {
+                        console.log('用户点击取消')
+                    }
+                }
+            })
+
+            return;
+        }
+
+        this.data.currentSubList.push(result);
+        
+        //将清单写入缓存
+        this.setStorageList('add');
+
+    },
+
+    /**
+     * 将清单写入缓存
+     */
+    setStorageList:function(type){
+        //存储清单
+        var that = this;
+
+        this.data.list = this.data.list === undefined 
+                        || this.data.list === {} || this.data.list === "" || this.data.list === null
+                        ? {} : this.data.list;
+
+        that.data.list[that.data.code] = that.data.currentSubList;
+
+        wx.setStorage({
+            key:"inlist",
+            data:that.data.list,
+            success:function(){
+                that.setData({
+                    itemNum:that.data.currentSubList.length            
+                })
+
+                if(type === 'add'){
+                    util.showSuccess('已成功加入清单');
+                }
+
+                if(type === 'cumulative'){
+                    util.showSuccess('入库数累加成功');
+                }
+            },
+            fail:function(){
+                util.showFail('加入清单失败，请再试一次');
+            }
+        })
+    },
+
     /**
      * 颜色picker选择器
      * @param   {[type]}  e  [description]
@@ -365,12 +532,39 @@ Page({
         //获得dialog组件 zjh
         this.dialog = this.selectComponent("#dialog");
 
-        this.errDialog = this.selectComponent("#err_dialog");
+        this.listDialog = this.selectComponent("#list_dialog");
     },
     /**
      * 生命周期函数--监听页面显示
      */
-    onShow: function() {},
+    onShow: function() {
+        util.mylog('hasLoad before show : ',hasLoad); 
+
+        //没有获取到库存信息时
+        // if(!hasLoad && app.globalData.currentProduct === null){
+        //     //网络查询货号
+        //     util.mylog('code in show : ',this.data.code); 
+        //     this.searchProduct(this.data.code);
+        // }
+
+        if(!hasLoad){
+
+            this.data.list = wx.getStorageSync('inlist');
+            this.data.currentSubList = this.data.list[this.data.code] === undefined 
+                                        || this.data.list[this.data.code] === [] 
+                                        ? [] : this.data.list[this.data.code];
+
+            util.mylog('list in show',this.data.list);                     
+            util.mylog('currentSubList in show',this.data.currentSubList);
+
+            // 获取清单条数
+            this.setData({
+                itemNum:this.data.currentSubList.length            
+            })
+        }
+
+        hasLoad = false;
+    },
     /**
      * 生命周期函数--监听页面隐藏
      */

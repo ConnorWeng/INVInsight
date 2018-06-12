@@ -7,7 +7,8 @@ var config = app.config;
 Page({
 	data:{
 		operate:'',
-		url:''
+		url:'',
+        type:'',
 	},
 	/**
      * 生命周期函数--监听页面加载
@@ -16,7 +17,8 @@ Page({
         console.log(options)
         this.setData({
             url: decodeURIComponent(options.url),
-            operate:options.operate
+            operate:options.operate,
+            type:options.type
         })
         console.log('success onLoad url',this.data.url)
 
@@ -29,9 +31,17 @@ Page({
 
     close:function(e){
     	console.log('close page',e)
-    	wx.navigateBack({
-		  delta: 1
-		})
+        console.log('type',this.data.type);
+        if(this.data.type === "batchin"){
+            wx.navigateBack({
+              delta: 2
+            })
+        }else{
+            wx.navigateBack({
+              delta: 1
+            })
+        }
+    	
     },
 
     doagain:function(e){

@@ -21,6 +21,16 @@
 	font-size: 30rpx;
 }
 
+.inlist{
+	margin-top:35rpx;
+	font-size:38rpx;
+
+}
+
+.inlist text{
+	color:red;
+}
+
 .stockin-form{
 	display: flex;
 	flex-direction: column;
@@ -223,15 +233,35 @@
 	align-items:center;
 }
 
-.normal-btn{
+.btn-list-area{
+	display:flex;
+	justify-content:center;
+	align-items:center;
+	width: 100%;
+}
+
+.btn-in-area{
+	width: 100%;
+}
+
+.listin-btn{
 	color:#FFFFFF;
 	background-color:#40bacf;
 	margin: 18rpx 0;
-	width:97%;
+	width:47%;
+
 
 }
 
-.photo-btn{
+.list-btn{
+	color:#000000;
+	background-color:#FFFFFF;
+	/*margin: 18rpx 0;*/
+	width:47%;
+
+}
+
+.in-btn{
 	color:#000000;
 	background-color:#FFFFFF;
 	margin: 18rpx 0;

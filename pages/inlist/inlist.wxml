@@ -1,0 +1,53 @@
+<!--pages/inlist/inlist.wxml-->
+
+<view class="container">
+
+  <view class="title">入库款号：<text class="code">{{code}}</text></view>
+
+
+  <form bindsubmit="formSubmit" id="stockout" class="outform">
+
+    <view class="form-section" style="display:none">
+      <input type="text" name="product_code" value="{{code}}" />
+    </view>
+
+    <view class="form-section" >
+    	<view>
+			  <block  wx:for="{{items}}">
+			  	<view class="list">
+
+			  		<view class="main-content">
+
+					  	<image class="delete-image" src="../common/image/delete.png" bindtap="delete" data-id="{{index}}"></image>
+					    <text class="sku" >{{item.color}},{{item.size}}</text>
+					    <text class="total" >(库存量：{{item.stock_amount}})</text>
+					</view>
+				    <view class="number">
+				    	<image src="../common/image/minus.png" class="minus" bindtap="minusCount" data-num="{{index}}" ></image>
+				    	<input  type="number" name="sku_{{index}}" value="{{item.number}}" bindblur="inputChange" data-id="{{index}}"/>
+				    	<image src="../common/image/add.png" class="add" bindtap="addCount" data-num="{{index}}" ></image>
+				    </view>
+				</view>
+			  </block>
+		</view>
+    </view>
+
+    <view class="btn-area">
+      <button formType="submit" id="confirm" class="btn" hover-class="button-hover">批量入库</button>
+    </view>
+
+  </form>
+
+  <dialog id='dialog' 
+      title='{{dialog.title}}'  
+      cancelText='取消' 
+      content='{{dialog.content}}'
+      confirm='确认'
+      bind:cancelEvent="_cancelEvent"  
+      bind:confirmEvent="_confirmEvent">
+  </dialog>
+  
+</view>
+
+
+

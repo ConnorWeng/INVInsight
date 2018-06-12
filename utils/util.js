@@ -76,11 +76,10 @@ var showTip = (title,content,action)=>{
 
 
 //自定义打印log
-var mylog = () =>{
+var mylog = function(){
   if(config.debug){
-    var args = arguments;
-    for(var i=0;i<args.length;i++){
-      console.log(args[i]);
+    for(var i=0;i<arguments.length;i++){
+      console.log(arguments[i]);
     }
   }
   
