@@ -46,8 +46,15 @@ Page({
 
     doagain:function(e){
     	console.log('doagain',e)
-    	wx.redirectTo({
-		  url: this.data.url
-		})
+        if(this.data.type === "batchin"){
+            wx.navigateBack({
+              delta: 1
+            })
+        }else{
+            wx.redirectTo({
+              url: this.data.url
+            })
+        }
+    	
     }
 });

@@ -20,7 +20,7 @@
 
 					  	<image class="delete-image" src="../common/image/delete.png" bindtap="delete" data-id="{{index}}"></image>
 					    <text class="sku" >{{item.color}},{{item.size}}</text>
-					    <text class="total" >(库存量：{{item.stock_amount}})</text>
+					    <text class="total"  wx:if="{{currentProduct !== null }}">(库存量：{{item.stock_amount}})</text>
 					</view>
 				    <view class="number">
 				    	<image src="../common/image/minus.png" class="minus" bindtap="minusCount" data-num="{{index}}" ></image>

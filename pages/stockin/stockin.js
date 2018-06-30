@@ -6,6 +6,8 @@ var util = app.util;
 var config = app.config;
 var initMax = 30; //滑块初始化时候的最大值
 var hasLoad = false;  // 判断是否经历过load
+var inlistMax = 100;  //限制清单的最大数量，防止恶意操作导致本地缓存爆满
+var subListMax = 100; //限制每张清单的条数
 
 Page({
     /**
@@ -192,11 +194,19 @@ Page({
         url = encodeURIComponent(url);  //编码，防止重复?，丢失参数的问题
         util.mylog('url before redirect :'+url);
 
+        var mydata = {
+            stocks:[
+                data
+            ]
+        };
+        // mydata[0]=data;
+        util.mylog(mydata);
+
         qcloud.request({
             url: config.service.generalUrl+'/stocks',
             login: true,
             method:'POST',
-            data:data,
+            data:mydata,
             success(result) {
                 util.mylog('result Data : ',result);
                 var res = result.data;
@@ -251,7 +261,13 @@ Page({
 
         // 增加清单
         if(e.detail.target.id === "add_list"){
-            this.showListDialog(result);
+            if(this.data.currentSubList.length >= subListMax){
+                util.mylog('subListMax',subListMax);
+                util.showModel('已达到最大限制','清单条数已达到'+subListMax+'条，请先将当前清单入库');
+            }else{
+                this.showListDialog(result);
+            }
+            
             return;
         }
 
@@ -353,6 +369,10 @@ Page({
                 if(type === 'cumulative'){
                     util.showSuccess('入库数累加成功');
                 }
+
+                //更新一下清单的添加时间
+                app.globalData.listAddTime[that.data.code] = Date.parse(new Date());
+                wx.setStorageSync('listAddTime', app.globalData.listAddTime);
             },
             fail:function(){
                 util.showFail('加入清单失败，请再试一次');
@@ -557,11 +577,43 @@ Page({
             util.mylog('list in show',this.data.list);                     
             util.mylog('currentSubList in show',this.data.currentSubList);
 
-            // 获取清单条数
-            this.setData({
-                itemNum:this.data.currentSubList.length            
-            })
+            
         }
+
+        //判断清单数是否达到了限制，
+        util.mylog('app.globalData.listAddTime.length',Object.getOwnPropertyNames(app.globalData.listAddTime).length);
+        if( Object.getOwnPropertyNames(app.globalData.listAddTime).length >= inlistMax){
+            util.mylog('inlistMax',inlistMax);
+            var minTime = Date.parse(new Date());
+            var getKey = 0;
+            //获取时间最小值(最早加入清单的时间)
+            for(var key in app.globalData.listAddTime){
+                if(minTime >= app.globalData.listAddTime[key]){
+                    minTime = app.globalData.listAddTime[key];
+                    getKey = key;
+                }
+            }
+
+            util.mylog('getKey',getKey);
+
+            //删除最早加入的清单
+            delete this.data.list[getKey]; 
+            delete app.globalData.listAddTime[getKey];
+
+            //更新缓存
+            wx.setStorageSync('inlist', this.data.list);
+            wx.setStorageSync('listAddTime', app.globalData.listAddTime);
+
+            //更新当前清单
+            this.data.currentSubList = this.data.list[this.data.code] === undefined 
+                                        || this.data.list[this.data.code] === [] 
+                                        ? [] : this.data.list[this.data.code];
+        }
+
+        // 获取清单条数
+        this.setData({
+            itemNum:this.data.currentSubList.length            
+        })
 
         hasLoad = false;
     },

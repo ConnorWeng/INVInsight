@@ -86,7 +86,7 @@ Page({
                 content:content
             }
         })
-        this.dialog.showDialog();
+        this.dialog.showDialog(result);
     },
     //取消事件
     _cancelEvent(e) {
@@ -100,21 +100,76 @@ Page({
         util.mylog('你点击了确定');
         this.dialog.hideDialog();
 
-
         //确认后与后台通讯
-        //后台返回后跳转(用重定向的方式)
+        this.deleteStock(e.detail);
+
+    },
+
+
+     /**
+     * 联网删除数据
+     * @param   {[type]}  data  [description]
+     * @return  {[type]}        [description]
+     */
+    deleteStock:function(data){
+        //显示加载动画
+        util.showBusy('出库中');
+
+        var that = this;
         var url = '../stockout/stockout?code='+this.data.code;
         url = encodeURIComponent(url);  //编码，防止重复?，丢失参数的问题
-        wx.redirectTo({
-          url: '../msg/msg_success?operate=出库&type=out&url='+url
-        })
+        util.mylog('url before redirect :'+url);
 
-        //失败
-        // wx.redirectTo({
-        //   url: '../msg/msg_fail?operate=出库&url='+url
-        // })
+        var tmpdata = [];
+        var i = 0;
+
+        for(var k in data){
+
+            if(k !== 'product_code' && k !== 'stock_id'){
+                tmpdata[i++] = {
+                    "sku_id":k,
+                    "stock_amount":data[k]
+                };
+            }
             
+        }
 
+        var mydata = {
+            "stocks":tmpdata
+        };
+
+
+        util.mylog('mydata',mydata);
+
+        qcloud.request({
+            url: config.service.generalUrl+'/stocks',
+            login: true,
+            method:'DELETE',
+            data:mydata,
+            success(result) {
+
+                util.mylog('result Data : ',result);
+                var res = result.data;
+                //隐藏加载动画
+                wx.hideToast();
+
+                //后台返回后跳转(用重定向的方式)
+                wx.redirectTo({
+                  url: '../msg/msg_success?operate=出库&type=out&url='+url
+                })
+            },
+
+            fail(error) {
+
+                //隐藏加载动画
+                wx.hideToast();
+
+                wx.redirectTo({
+                    url: '../msg/msg_fail?operate=出库&url='+url
+                })
+
+            }
+        })
     },
 
 

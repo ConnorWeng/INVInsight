@@ -17,6 +17,7 @@ Page({
         list:{},
         currentSubList:[],
         items: [],
+        currentProduct:null,
         dialog:{     //zjh 例子
             title:'xxx 入库',     
             content:[
@@ -34,9 +35,6 @@ Page({
     onLoad: function(options) {
 
         util.mylog(options)
-        this.setData({
-            code: options.code
-        })
 
         //从缓存中获取对应入库清单
         this.data.list = wx.getStorageSync('inlist');
@@ -48,11 +46,11 @@ Page({
         util.mylog('currentSubList',this.data.currentSubList);
 
         //设置库存量
-        this.setResult(this.data.currentSubList);
+        this.setResult(this.data.currentSubList,options.code);
     },  
 
     //设置库存量
-    setResult:function(data){
+    setResult:function(data,code){
 
         var items = data;
 
@@ -76,7 +74,9 @@ Page({
         util.mylog('items : ',items)
 
         this.setData({
-            items:items
+            items:items,
+            currentProduct:app.globalData.currentProduct,
+            code:code
         })
     },
 
@@ -115,26 +115,82 @@ Page({
         util.mylog('你点击了确定');
         this.dialog.hideDialog();
 
-
         //确认后与后台通讯
-        //后台返回后跳转(用重定向的方式)
-        //删除清单
-        this.data.currentSubList = [];
-        //保存到缓存
-        this.saveToStorage();
+        this.postStock(this.data.currentSubList);
 
+    },
+
+    /**
+     * 联网推送数据
+     * @param   {[type]}  data  [description]
+     * @return  {[type]}        [description]
+     */
+    postStock:function(data){
+        //显示加载动画
+        util.showBusy('入库中');
+
+        var that = this;
         var url = '../stockin/stockin?code='+this.data.code;
         url = encodeURIComponent(url);  //编码，防止重复?，丢失参数的问题
-        wx.redirectTo({
-          url: '../msg/msg_success?operate=入库&type=batchin&url='+url
+        util.mylog('url before redirect :'+url);
+
+        var tmpdata = [];
+
+        for(var k in data){
+            tmpdata[k] = {
+                "product_code":this.data.code,
+                "color":data[k]['color'],
+                "size":data[k]['size'],
+                "stock_amount":data[k]['number']
+            };
+        }
+
+        var mydata = {
+            "stocks":tmpdata
+        };
+
+
+        util.mylog('mydata',mydata);
+
+        qcloud.request({
+            url: config.service.generalUrl+'/stocks',
+            login: true,
+            method:'POST',
+            data:mydata,
+            success(result) {
+
+                //删除清单
+                that.data.currentSubList = [];
+                //保存到缓存
+                that.saveToStorage();
+
+                util.mylog('result Data : ',result);
+                var res = result.data;
+                //隐藏加载动画
+                wx.hideToast();
+
+                //后台返回后跳转(用重定向的方式)
+                wx.redirectTo({
+                  url: '../msg/msg_success?operate=入库&type=batchin&url='+url
+                })
+            },
+
+            fail(error) {
+
+                 //删除清单
+                // that.data.currentSubList = [];
+                // //保存到缓存
+                // that.saveToStorage();
+
+                //隐藏加载动画
+                wx.hideToast();
+
+                wx.redirectTo({
+                    url: '../msg/msg_fail?operate=入库&url='+url
+                })
+
+            }
         })
-
-        //失败
-        // wx.redirectTo({
-        //   url: '../msg/msg_fail?operate=出库&url='+url
-        // })
-            
-
     },
 
 
@@ -294,8 +350,19 @@ Page({
                         || this.data.list === {} || this.data.list === "" || this.data.list === null
                         ? {} : this.data.list;
 
-        this.data.list[this.data.code] = this.data.currentSubList;
+        if(this.data.currentSubList.length == 0){
+            // this.data.list[this.data.code] = this.data.currentSubList;
+            var code = this.data.code;
+            delete this.data.list[code];
 
+            //删除清单的添加时间
+            delete app.globalData.listAddTime[code];
+            wx.setStorageSync('listAddTime', app.globalData.listAddTime);
+
+        }else{
+            this.data.list[this.data.code] = this.data.currentSubList;
+        }
+        
         wx.setStorageSync('inlist', this.data.list)
     },
 

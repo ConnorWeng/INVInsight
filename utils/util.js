@@ -86,4 +86,13 @@ var mylog = function(){
 }
 
 
-module.exports = { formatTime, showBusy, showSuccess, showFail,showModel ,showDebugModel,showTip,mylog}
+//制作简单异步函数
+var myAsync=function(time,object,callback){
+    //read data
+    setTimeout(function(){
+        callback(object);
+    },time);//x毫秒后回调
+};
+
+
+module.exports = { formatTime, showBusy, showSuccess, showFail,showModel ,showDebugModel,showTip,mylog,myAsync}

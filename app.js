@@ -61,7 +61,46 @@ App({
             var wait = wx.getStorageSync('wait')
             util.mylog('storage.wait...:' + wait);
         }
+
+
+        //删除超过3天都没有入库的货号的清单
+        that.globalData.listAddTime = wx.getStorageSync('listAddTime');
+        that.globalData.listAddTime = that.globalData.listAddTime === undefined 
+                        || that.globalData.listAddTime === {} || that.globalData.listAddTime === "" || that.globalData.listAddTime === null
+                        ? {} : that.globalData.listAddTime;
+
+        util.myAsync(10,that.globalData.listAddTime,function(object) {
+            
+            util.mylog('++++++++ delete list ++++++++');
+
+            if(JSON.stringify(that.globalData.listAddTime) !== "{}"){ //不为空对象
+
+                var nowDate = Date.parse(new Date());
+                var tmpDate = null;
+
+                var list = wx.getStorageSync('inlist');
+
+                list = list === undefined || list === {} || list === "" || list === null ? {} : list
+
+                for(var key in that.globalData.listAddTime){
+                    
+                    tmpDate = that.globalData.listAddTime[key];
+                    util.mylog('nowDate',nowDate);
+                    util.mylog('tmpDate',tmpDate);
+                    util.mylog((nowDate-tmpDate)/(1000*60*60*24));
+                    if( (nowDate-tmpDate)/(1000*60*60*24) > 3){  //大于3天
+                        delete list[key];  //删除某个商品的入库清单
+                        delete that.globalData.listAddTime[key];
+                    }
+                }
+
+                //更新缓存
+                wx.setStorageSync('inlist', list);
+                wx.setStorageSync('listAddTime', that.globalData.listAddTime);
+            }
+        });
        
+        util.mylog('+++++++ app end ++++++++');
     },
 
 
@@ -78,6 +117,7 @@ App({
             detail:0
         },
         currentProduct:null,
+        listAddTime:null,
     },
 
     // 引入常用的配置和工具
