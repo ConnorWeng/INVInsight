@@ -30,7 +30,9 @@
 		  	<view class="checkbox">
 
 		  		<view class="main-content">
-				  	<checkbox value="{{item.sku_id}}" data-check="{{item.check}}" id="{{item.sku_id}}" color="{{item.checkbox_color}}" bindtap="bindcheck" color="#40bacf"></checkbox>
+				  	<checkbox disabled="true" value="{{item.sku_id}}" data-check="{{item.check}}" id="{{item.sku_id}}" color="{{item.checkbox_color}}" bindtap="bindcheck" color="#40bacf" wx:if="{{item.stock_amount == 0}}"></checkbox>
+
+            <checkbox value="{{item.sku_id}}" data-check="{{item.check}}" id="{{item.sku_id}}" color="{{item.checkbox_color}}" bindtap="bindcheck" color="#40bacf" wx:else></checkbox>
 
 				    <text class="sku" style="{{item.color_style}}">{{item.color}},{{item.size}}</text>
 				    <text class="total" style="{{item.color_style}}">(库存量：{{item.stock_amount}})</text>
